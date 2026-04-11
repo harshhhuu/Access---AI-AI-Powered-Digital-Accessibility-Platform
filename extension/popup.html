@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 260px; font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #f9fafb; }
+    .header { background: linear-gradient(135deg, #1A56DB, #7E3AF2); padding: 14px 18px; text-align: center; }
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .header p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+    .card { margin: 12px; background: #1a1a2e; border-radius: 8px; padding: 12px 14px; border: 1px solid #2d2d44; }
+    .card h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9CA3AF; margin-bottom: 8px; }
+    .phrase { background: #2d2d44; color: #A78BFA; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-family: monospace; display: inline-block; margin: 3px 0; }
+    .btn { display: block; margin: 0 12px 12px; background: linear-gradient(135deg, #1A56DB, #7E3AF2); color: white; border: none; border-radius: 7px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; width: calc(100% - 24px); }
+    .note { text-align: center; font-size: 10px; color: #4B5563; padding: 0 12px 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>♿ AccessAI</h1>
+    <p>Voice launcher — always listening</p>
+  </div>
+  <div class="card">
+    <h3>Say any of these</h3>
+    <div class="phrase">"Open AccessAI"</div><br>
+    <div class="phrase">"Launch AccessAI"</div><br>
+    <div class="phrase">"Start AccessAI"</div>
+  </div>
+  <button class="btn" id="openBtn">Open AccessAI Now</button>
+  <p class="note">AccessAI © 2026 — Free & Open Source</p>
+  <script src="popup.js"></script>
+</body>
+</html>
