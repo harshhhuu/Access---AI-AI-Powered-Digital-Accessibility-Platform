@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import multipart from "@fastify/multipart";
 import type { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { describeImageLocally } from "../lib/describe-local.js";
@@ -59,12 +58,6 @@ async function generateDescription(
 }
 
 export const describeRoutes: FastifyPluginAsync = async (app) => {
-  await app.register(multipart, {
-    limits: {
-      fileSize: 5 * 1024 * 1024,
-    },
-  });
-
   app.post("/describe", async (request, reply) => {
     const data = await request.file();
     if (!data) {

@@ -195,15 +195,17 @@ flowchart TB
 
 ## Phase 6 — Voice (`POST /api/voice`)
 
+**Status:** Implemented in `server/src/routes/voice.ts`, `server/src/lib/hf-voice.ts`. App-level `@fastify/multipart` with **25 MB** limit (`server/src/app.ts`); describe still enforces **5 MB** after `toBuffer()` in `describe.ts`. Cache key matches Python: `SHA-256(b"voice:" + audio_bytes)`; `endpoint: "voice"`. HF: `openai/whisper-large-v3` on Router, `Content-Type: audio/wav`, **120s** timeout, **503** retries **20s / 30s / 40s** (max 3).
+
 **Goal:** Audio upload → Whisper on HF → cache → response.
 
 **Tasks:**
 
-- [ ] Match audio format acceptance and validation from `voice.py`.
-- [ ] Same cache key + `api_cache` endpoint label (`"voice"`).
-- [ ] HF Whisper request/response shape and retries.
+- [x] Match audio format acceptance and validation from `voice.py` (empty / 25 MB; multipart field `audio`; permissive content-type like Python).
+- [x] Same cache key + `api_cache` endpoint label (`"voice"`).
+- [x] HF Whisper request/response shape and retries.
 
-**Exit criteria:** Sample audio file returns transcript; cache works.
+**Exit criteria:** Sample audio file returns transcript; cache works. **Verified:** `pnpm run build`; multipart `POST /api/voice` reaches HF (invalid bytes → `502` with HF error detail).
 
 ---
 

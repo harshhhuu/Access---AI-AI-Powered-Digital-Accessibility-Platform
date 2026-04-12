@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.13] — 2026-04-12
+
+- Phase 6 voice on Node: `POST /api/voice` (multipart `audio`), `hf-voice.ts` (Whisper on HF Router + 503 retry), `api_cache` key `voice:` + bytes; global multipart **25 MB**. Updated `05-node-migration-phased-plan.md`, `server/README.md`.
+
 ## [brain-0.1.12] — 2026-04-12
 
 - Phase 5 image describe on Node: `POST /api/describe`, `POST /api/describe/url` (multipart, sharp fallback, HF vision + 503 retry); `HF_VISION_MODEL` in `server/.env`. Updated `05-node-migration-phased-plan.md`, `server/README.md`.

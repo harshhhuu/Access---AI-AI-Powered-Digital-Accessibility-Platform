@@ -1,9 +1,11 @@
 import cors from "@fastify/cors";
+import multipart from "@fastify/multipart";
 import Fastify, { type FastifyInstance } from "fastify";
 import { prisma } from "./lib/prisma.js";
 import { authRoutes } from "./routes/auth.js";
 import { describeRoutes } from "./routes/describe.js";
 import { simplifyRoutes } from "./routes/simplify.js";
+import { voiceRoutes } from "./routes/voice.js";
 
 function parseOrigins(): string[] {
   const frontend = process.env.FRONTEND_URL ?? "https://your-vercel-app.vercel.app";
@@ -27,6 +29,10 @@ export async function buildApp(): Promise<FastifyInstance> {
     allowedHeaders: "*",
   });
 
+  await app.register(multipart, {
+    limits: { fileSize: 25 * 1024 * 1024 },
+  });
+
   app.get("/health", async () => ({
     status: "ok",
     message: "AccessAI API is running",
@@ -35,6 +41,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(simplifyRoutes, { prefix: "/api" });
   await app.register(describeRoutes, { prefix: "/api" });
+  await app.register(voiceRoutes, { prefix: "/api" });
 
   app.addHook("onReady", async () => {
     await prisma.$queryRaw`SELECT 1`;

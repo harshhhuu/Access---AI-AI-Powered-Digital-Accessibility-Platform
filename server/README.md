@@ -1,6 +1,6 @@
 # AccessAI Node API (migration)
 
-**Fastify** + **Prisma** + **TypeScript**. Phase 2 added `GET /health` and DB; **Phase 3** added **`/auth/*`** (register, login, me, preferences). **Phase 4** added **`POST /api/simplify`**. **Phase 5** added **`POST /api/describe`** (multipart `image`) and **`POST /api/describe/url`** (JSON `url`), matching `backend/routers/describe.py` (sharp fallback when HF returns 502).
+**Fastify** + **Prisma** + **TypeScript**. Phase 2 added `GET /health` and DB; **Phase 3** added **`/auth/*`** (register, login, me, preferences). **Phase 4** added **`POST /api/simplify`**. **Phase 5** added **`POST /api/describe`** (multipart `image`) and **`POST /api/describe/url`** (JSON `url`), matching `backend/routers/describe.py` (sharp fallback when HF returns 502). **Phase 6** added **`POST /api/voice`** (multipart `audio`, ≤ 25 MB) — Whisper `openai/whisper-large-v3` via HF Router, same cache key as Python.
 
 ## Prerequisites
 
@@ -35,6 +35,7 @@ pnpm dev
 - Auth: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `PUT /auth/preferences` (Bearer token)
 - Simplify: `POST /api/simplify` — JSON `{ "text", "grade_level"? }`; needs `HF_API_TOKEN`, `HF_TEXT_MODEL`
 - Describe: `POST /api/describe` — multipart field **`image`** (JPEG/PNG/WebP/GIF, ≤ 5 MB); `POST /api/describe/url` — JSON `{ "url" }`; needs `HF_VISION_MODEL` (and `HF_API_TOKEN`)
+- Voice: `POST /api/voice` — multipart field **`audio`** (≤ 25 MB); needs `HF_API_TOKEN` (Whisper model URL matches `backend/routers/voice.py`)
 
 Use `PORT=8001` in `.env` if the Python backend still uses 8000.
 
@@ -47,7 +48,7 @@ Use `PORT=8001` in `.env` if the Python backend still uses 8000.
 | `ALGORITHM` | Default `HS256` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Default `1440` |
 | `FRONTEND_URL` | CORS allowlist |
-| `HF_API_TOKEN` | Hugging Face Router token (required for `/api/simplify`) |
+| `HF_API_TOKEN` | Hugging Face Router token (required for `/api/simplify`, `/api/describe`, `/api/voice`) |
 | `HF_TEXT_MODEL` | Defaults to `Qwen/Qwen2.5-72B-Instruct:novita` |
 | `HF_VISION_MODEL` | Defaults to `CohereLabs/aya-vision-32b:cohere` (describe routes) |
 | `PORT` / `HOST` | Listen address (default `8000` / `0.0.0.0`) |
