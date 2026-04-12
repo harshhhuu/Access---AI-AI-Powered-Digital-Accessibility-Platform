@@ -257,16 +257,18 @@ Pick **one** pattern (document in README):
 
 ## Phase 9 — Deployment and cutover
 
+**Status:** **`docker-compose.yml`** — profile **`fullstack`** builds **sign-inference** (internal `:9001` only) + **Node API** (`server/Dockerfile`, **8001** → host) + existing **db**. `DATABASE_URL` / `SIGN_SERVICE_URL` overridden in Compose for in-network hosts; JWT/HF from `server/.env` (use secret management in real prod). **`deploy/README.md`** — rollback + canary notes. **`pnpm dev:docker`** / **`scripts/dev-docker-stack.sh`** — Compose stack + Vite on host. **`scripts/dev-all.sh --docker`** delegates to the same. Frontend Axios/WS defaults in **`api.js`** use Node (**8001**).
+
 **Tasks:**
 
-- [ ] **Compose or K8s:** Node + Python sign + Postgres; internal network only for Python.
-- [ ] **Env:** `SIGN_SERVICE_URL` in Node; never commit secrets.
-- [ ] **Frontend:** `VITE_API_BASE_URL` and `VITE_WS_URL` point to Node host (same origin as today, new port if needed).
-- [ ] **Extension:** Update any hardcoded API URLs if present.
-- [ ] **Blue/green or canary:** Run Node behind new hostname first; switch when stable.
-- [ ] **Rollback plan:** Revert DNS/env to old FastAPI monolith until fixed.
+- [x] **Compose or K8s:** Node + Python sign + Postgres; internal network only for Python.
+- [x] **Env:** `SIGN_SERVICE_URL` in Node; never commit secrets. *(Compose sets `http://sign:9001`; document-only for production secrets.)*
+- [x] **Frontend:** `VITE_API_BASE_URL` and `VITE_WS_URL` point to Node host (same origin as today, new port if needed). *(Defaults in code + tracked `frontend/.env`.)*
+- [x] **Extension:** Update any hardcoded API URLs if present. *(Chrome extension only opens the Vite URL; no API host change.)*
+- [x] **Blue/green or canary:** Run Node behind new hostname first; switch when stable. *(Documented in `deploy/README.md`.)*
+- [x] **Rollback plan:** Revert DNS/env to old FastAPI monolith until fixed. *(Documented in `deploy/README.md`.)*
 
-**Exit criteria:** Production traffic on Node + Python sign; monitors green.
+**Exit criteria:** Production traffic on Node + Python sign; monitors green. **Local verified:** `docker compose config`, `docker build ./server`; full stack requires `server/.env` for HF/JWT when exercising the API container.
 
 ---
 
@@ -274,7 +276,7 @@ Pick **one** pattern (document in README):
 
 **Tasks:**
 
-- [ ] Archive or delete `backend/` Python **monolith** code paths; **keep** `services/sign-inference/` (or equivalent) as the only Python.
+- [ ] delete `backend/` Python **monolith** code paths; **keep** `services/sign-inference/` (or equivalent) as the only Python.
 - [ ] Update `brain/01-project-overview.md`, `brain/04-features-and-stack.md`, `brain/02-local-dev.md`, root `README.md`.
 - [ ] Brain changelog entry for migration complete.
 

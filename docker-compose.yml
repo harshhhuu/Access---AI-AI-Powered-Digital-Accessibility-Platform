@@ -1,5 +1,6 @@
-# Local PostgreSQL matching backend/.env DATABASE_URL (port 5433, db accessai).
-# Requires Docker Desktop (or daemon) running: docker compose up -d
+# Local PostgreSQL (default: `docker compose up -d` → db only on port 5433).
+# Full stack (Node API + sign-inference + Postgres): `docker compose --profile fullstack up -d --build`
+# Sign-inference is not published to the host; only the `api` service reaches it at http://sign:9001.
 
 services:
   db:
@@ -16,3 +17,33 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  sign:
+    profiles: ["fullstack"]
+    build:
+      context: ./services/sign-inference
+    container_name: accessai-sign
+    # Internal only — Node API uses SIGN_SERVICE_URL=http://sign:9001
+    expose:
+      - "9001"
+
+  api:
+    profiles: ["fullstack"]
+    build:
+      context: ./server
+    container_name: accessai-api
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql://postgres:root@db:5432/accessai
+      SIGN_SERVICE_URL: http://sign:9001
+      PORT: "8001"
+      HOST: "0.0.0.0"
+      NODE_ENV: production
+    env_file:
+      - server/.env
+    depends_on:
+      db:
+        condition: service_healthy
+      sign:
+        condition: service_started

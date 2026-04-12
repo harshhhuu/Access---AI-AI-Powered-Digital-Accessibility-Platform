@@ -11,6 +11,7 @@ Small, focused notes for the AccessAI repo. Add new topics as `NN-short-name.md`
 | [04-features-and-stack](04-features-and-stack.md) | Features and technology stack (end-to-end) |
 | [05-node-migration-phased-plan](05-node-migration-phased-plan.md) | Phased implementation plan: Node API + Python sign service |
 | [server/README.md](../server/README.md) | Node Fastify + Prisma API (migration shell) |
+| [deploy/README.md](../deploy/README.md) | Phase 9 Compose stack, rollback / canary notes |
 
 ## Conventions
 

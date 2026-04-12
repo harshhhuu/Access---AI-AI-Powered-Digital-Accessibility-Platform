@@ -21,6 +21,8 @@ pnpm dev
 
 This runs `scripts/dev-all.sh`: starts **Docker Postgres** (`docker compose up -d` when Docker is available), then **concurrently** — sign-inference on **9001**, Node API in `server/` (default **8001** from `server/.env`), Vite in `frontend/`. Use **Ctrl+C** to stop all processes; Postgres keeps running until `docker compose down`.
 
+**Docker Compose API stack** (Node + sign-inference + Postgres in containers; Vite on the host): `pnpm dev:docker` — see `deploy/README.md`. Same as `bash scripts/dev-all.sh --docker`.
+
 First-time **Prisma client** (if you have not built the server yet):
 
 ```bash

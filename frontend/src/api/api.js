@@ -2,10 +2,10 @@ import axios from "axios";
 
 // ---------------------------------------------------------------------------
 // Axios instance — reads base URL from .env
-// VITE_API_BASE_URL=http://localhost:8000
+// VITE_API_BASE_URL=http://localhost:8001 (Node API default)
 // ---------------------------------------------------------------------------
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8001",
   timeout: 30000, // 30 s — HuggingFace can be slow on free tier
   headers: {
     "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const registerUser = ({ email, password }) =>
 // Message received: { sign: string, confidence: number }
 // ===========================================================================
 export const WS_SIGN_URL =
-  (import.meta.env.VITE_WS_URL || "ws://localhost:8000") + "/ws/sign";
+  (import.meta.env.VITE_WS_URL || "ws://localhost:8001") + "/ws/sign";
 
 // ===========================================================================
 // VOICE NAVIGATOR

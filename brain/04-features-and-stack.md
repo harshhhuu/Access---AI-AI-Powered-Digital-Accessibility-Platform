@@ -9,7 +9,7 @@ How the main product areas work end-to-end and which libraries or services they 
 | Layer | Technology |
 | --- | --- |
 | Web UI | React 19, Vite 7, React Router 7, Tailwind CSS 4, shadcn-style UI (Radix, CVA, `tailwind-merge`) |
-| HTTP client | Axios (`VITE_API_BASE_URL`, default `http://localhost:8000`) |
+| HTTP client | Axios (`VITE_API_BASE_URL`, default `http://localhost:8001` for Node API) |
 | Real-time (sign) | WebSocket `ws://…/ws/sign` (`VITE_WS_URL` + path) |
 | Backend API | FastAPI (Python), Uvicorn, SQLAlchemy, PostgreSQL |
 | ML (server) | TensorFlow (Keras) for sign language `.h5`; NumPy |

@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.17] — 2026-04-12
+
+- Phase 9 deployment: Docker Compose profile `fullstack` (Postgres + internal sign-inference + Node API on 8001), `server/Dockerfile` + `docker-entrypoint.sh` (Prisma migrate deploy); `deploy/README.md`; `pnpm dev:docker` and `dev-all.sh --docker`; frontend API/WS defaults → Node 8001. Updated `05-node-migration-phased-plan.md`, `02-local-dev.md`, `README.md`, `server/README.md`.
+
 ## [brain-0.1.16] — 2026-04-12
 
 - Root `pnpm dev` + `scripts/dev-all.sh`: starts Docker Postgres (if available), sign-inference (9001), Node API (`server`), Vite (`frontend`) via `concurrently`; root `package.json` + `node_modules/` gitignored. Documented in `02-local-dev.md`.

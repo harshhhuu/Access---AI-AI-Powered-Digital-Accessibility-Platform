@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
-# Start local Postgres (Docker), sign-inference (9001), Node API (8001), Vite frontend.
+# Start local Postgres (Docker), sign-inference (9001), Node API (8001), Vite frontend — all on the host.
+#
+# Alternative (Phase 9): API + sign + Postgres in Docker, Vite on host:
+#   pnpm dev:docker
+#   (see deploy/README.md)
+#
+# Usage: bash scripts/dev-all.sh
 # Prerequisites: Docker (optional), pnpm, services/sign-inference/.venv — see brain/02-local-dev.md
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+
+if [[ "${1:-}" == "--docker" ]]; then
+  exec bash "$ROOT/scripts/dev-docker-stack.sh"
+fi
 
 if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
   docker compose up -d

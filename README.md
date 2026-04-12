@@ -216,6 +216,8 @@ pnpm dev
 
 This runs **Docker Postgres** (if Docker is running), **sign-inference** on port 9001, the **Node API** in `server/` (port from `server/.env`, usually 8001), and the **Vite** dev server. Stop child processes with Ctrl+C.
 
+**All-in-Docker API** (Postgres + sign-inference + Node in Compose; Vite on the host): `pnpm dev:docker` — see `deploy/README.md`.
+
 ---
 
 # 🔧 Backend Setup

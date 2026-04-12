@@ -31,7 +31,7 @@ pnpm run db:migrate:dev
 pnpm dev
 ```
 
-- Health: `GET http://localhost:8000/health` → `{"status":"ok","message":"AccessAI API is running"}`
+- Health: `GET http://localhost:<PORT>/health` (default **8000** or **8001** from `PORT` in `.env`) → `{"status":"ok","message":"AccessAI API is running"}`
 - Auth: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `PUT /auth/preferences` (Bearer token)
 - Simplify: `POST /api/simplify` — JSON `{ "text", "grade_level"? }`; needs `HF_API_TOKEN`, `HF_TEXT_MODEL`
 - Describe: `POST /api/describe` — multipart field **`image`** (JPEG/PNG/WebP/GIF, ≤ 5 MB); `POST /api/describe/url` — JSON `{ "url" }`; needs `HF_VISION_MODEL` (and `HF_API_TOKEN`)
@@ -49,6 +49,16 @@ Use `PORT=8001` in `.env` if the Python monolith still uses 8000. For end-to-end
 ### Optional load testing
 
 See **`load/README.md`** — k6 smoke script for `POST /api/simplify` (install k6 separately).
+
+### Docker (Compose profile `fullstack`)
+
+From the **repo root** — builds **sign-inference** (internal port 9001, not published) + this API on **8001**:
+
+```bash
+docker compose --profile fullstack up -d --build
+```
+
+Requires **`server/.env`** for `HF_*`, `SECRET_KEY`, etc. Compose overrides **`DATABASE_URL`** and **`SIGN_SERVICE_URL`** for in-network service names (`db`, `sign`). Image: **`Dockerfile`** in this folder; entrypoint runs **`prisma migrate deploy`** then **`node dist/index.js`**. See **`../deploy/README.md`**.
 
 ## Environment
 
