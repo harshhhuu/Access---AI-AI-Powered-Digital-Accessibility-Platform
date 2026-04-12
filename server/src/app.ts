@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
 import websocket from "@fastify/websocket";
@@ -19,9 +20,18 @@ function parseOrigins(): string[] {
   ];
 }
 
-export async function buildApp(): Promise<FastifyInstance> {
+export type BuildAppOptions = {
+  /** Skip Prisma ping on startup / disconnect on close (for tests without a database). */
+  skipDatabaseHooks?: boolean;
+};
+
+export async function buildApp(options?: BuildAppOptions): Promise<FastifyInstance> {
   const app = Fastify({
     logger: true,
+    genReqId: (req) => {
+      const h = req.headers["x-request-id"];
+      return typeof h === "string" && h.length > 0 ? h : randomUUID();
+    },
   });
 
   await app.register(cors, {
@@ -29,6 +39,10 @@ export async function buildApp(): Promise<FastifyInstance> {
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: "*",
+  });
+
+  app.addHook("onRequest", async (request, reply) => {
+    reply.header("x-request-id", request.id);
   });
 
   await app.register(multipart, {
@@ -48,13 +62,15 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(voiceRoutes, { prefix: "/api" });
   await app.register(signRoutes);
 
-  app.addHook("onReady", async () => {
-    await prisma.$queryRaw`SELECT 1`;
-  });
+  if (!options?.skipDatabaseHooks) {
+    app.addHook("onReady", async () => {
+      await prisma.$queryRaw`SELECT 1`;
+    });
 
-  app.addHook("onClose", async () => {
-    await prisma.$disconnect();
-  });
+    app.addHook("onClose", async () => {
+      await prisma.$disconnect();
+    });
+  }
 
   return app;
 }

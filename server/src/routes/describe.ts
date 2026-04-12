@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyBaseLogger, FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { describeImageLocally } from "../lib/describe-local.js";
 import { callHfDescribe, HfDescribeError } from "../lib/hf-describe.js";
 import { fetchRemoteImage } from "../lib/fetch-remote-image.js";
 import { prisma } from "../lib/prisma.js";
+import { logUpstreamMs } from "../lib/upstream-log.js";
 
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
@@ -19,6 +20,7 @@ function describeCacheKey(imageBytes: Buffer): string {
 async function generateDescription(
   imageBytes: Buffer,
   contentType: string,
+  log?: FastifyBaseLogger,
 ): Promise<{ description: string; cached: boolean }> {
   const cacheKey = describeCacheKey(imageBytes);
 
@@ -31,7 +33,14 @@ async function generateDescription(
 
   let description: string;
   try {
-    description = await callHfDescribe(imageBytes, contentType);
+    const t0 = performance.now();
+    try {
+      description = await callHfDescribe(imageBytes, contentType);
+    } finally {
+      if (log) {
+        logUpstreamMs(log, "hf_describe", Math.round(performance.now() - t0));
+      }
+    }
   } catch (e) {
     if (e instanceof HfDescribeError && e.statusCode === 502) {
       try {
@@ -78,7 +87,7 @@ export const describeRoutes: FastifyPluginAsync = async (app) => {
     }
 
     try {
-      const result = await generateDescription(imageBytes, mime || "image/png");
+      const result = await generateDescription(imageBytes, mime || "image/png", request.log);
       return reply.send(result);
     } catch (e) {
       const err = e as Error & { statusCode?: number };
@@ -108,7 +117,7 @@ export const describeRoutes: FastifyPluginAsync = async (app) => {
     }
 
     try {
-      const result = await generateDescription(imageBytes, contentType);
+      const result = await generateDescription(imageBytes, contentType, request.log);
       return reply.send(result);
     } catch (e) {
       const err = e as Error & { statusCode?: number };

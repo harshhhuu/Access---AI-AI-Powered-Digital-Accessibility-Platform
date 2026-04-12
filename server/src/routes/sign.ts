@@ -1,6 +1,7 @@
 import type { FastifyPluginAsync } from "fastify";
 import { predictSign, SignServiceError } from "../lib/sign-service-client.js";
 import { prisma } from "../lib/prisma.js";
+import { logUpstreamMs } from "../lib/upstream-log.js";
 
 function parseLandmarks(body: unknown):
   | { ok: true; landmarks: number[] }
@@ -35,7 +36,9 @@ export const signRoutes: FastifyPluginAsync = async (app) => {
     }
 
     try {
+      const t0 = performance.now();
       const result = await predictSign(parsed.landmarks);
+      logUpstreamMs(request.log, "sign_inference", Math.round(performance.now() - t0));
       await prisma.signLog.create({
         data: {
           detectedSign: result.sign,
@@ -53,7 +56,7 @@ export const signRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  app.get("/ws/sign", { websocket: true }, (socket) => {
+  app.get("/ws/sign", { websocket: true }, (socket, request) => {
     socket.on("message", async (raw: Buffer) => {
       let data: unknown;
       try {
@@ -77,7 +80,9 @@ export const signRoutes: FastifyPluginAsync = async (app) => {
       }
 
       try {
+        const t0 = performance.now();
         const result = await predictSign(nums);
+        logUpstreamMs(request.log, "sign_inference", Math.round(performance.now() - t0));
         sendJson(socket, result);
       } catch (e) {
         const msg = e instanceof SignServiceError ? e.message : e instanceof Error ? e.message : String(e);

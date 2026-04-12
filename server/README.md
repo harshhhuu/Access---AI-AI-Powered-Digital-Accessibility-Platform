@@ -41,6 +41,15 @@ pnpm dev
 
 Use `PORT=8001` in `.env` if the Python monolith still uses 8000. For end-to-end sign with **Node only** as the public API, run **sign-inference** on **9001** (see `services/sign-inference/README.md`), set **`SIGN_SERVICE_URL`**, and point the frontend at **`ws://localhost:8001`** (`VITE_WS_URL`).
 
+### Observability
+
+- **Request tracing:** `genReqId` (from `x-request-id` header or UUID). Response includes **`x-request-id`** echoing the request id.
+- **Upstream latency:** JSON logs with `upstream` (`hf_simplify` \| `hf_describe` \| `hf_whisper` \| `sign_inference`) and `upstreamMs` after each Hugging Face or sign-inference call.
+
+### Optional load testing
+
+See **`load/README.md`** — k6 smoke script for `POST /api/simplify` (install k6 separately).
+
 ## Environment
 
 | Variable | Role |
@@ -62,6 +71,7 @@ Use `PORT=8001` in `.env` if the Python monolith still uses 8000. For end-to-end
 | --- | --- |
 | `pnpm dev` | Dev server with reload (`tsx watch`) |
 | `pnpm build` | Compile to `dist/` |
+| `pnpm test` | Vitest — contract + sign client/golden tests (no DB required) |
 | `pnpm start` | Run compiled app |
 | `pnpm run db:migrate:dev` | Create/apply migrations (development) |
 | `pnpm run db:migrate` | Apply migrations (production / CI) |

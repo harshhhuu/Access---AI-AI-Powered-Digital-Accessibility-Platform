@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.15] — 2026-04-12
+
+- Phase 8 parity/testing/observability: Vitest contract + sign golden/failure tests; `buildApp({ skipDatabaseHooks })`; request id + `x-request-id` response header; structured `upstream`/`upstreamMs` logs; optional k6 simplify smoke (`server/load/`). Updated `05-node-migration-phased-plan.md`, `server/README.md`.
+
 ## [brain-0.1.14] — 2026-04-12
 
 - Phase 7 sign on Node: `POST /api/sign/predict` (proxy to Python `SIGN_SERVICE_URL`, `SignLog` on success), `GET /ws/sign` (per-message proxy, no DB log); `server/.env` adds `SIGN_SERVICE_URL`; `frontend/.env` sets `VITE_WS_URL=ws://localhost:8001` for Node WS. Updated `05-node-migration-phased-plan.md`, `server/README.md`, `02-local-dev.md`.

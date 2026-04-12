@@ -3,6 +3,7 @@ import type { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { callHfSimplify } from "../lib/hf-simplify.js";
 import { prisma } from "../lib/prisma.js";
+import { logUpstreamMs } from "../lib/upstream-log.js";
 import { wordCount } from "../lib/word-count.js";
 
 const simplifyBody = z.object({
@@ -44,7 +45,9 @@ export const simplifyRoutes: FastifyPluginAsync = async (app) => {
 
     let simplifiedText: string;
     try {
+      const t0 = performance.now();
       simplifiedText = await callHfSimplify(text, gradeLevel);
+      logUpstreamMs(request.log, "hf_simplify", Math.round(performance.now() - t0));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       return reply.status(502).send({ detail: msg });

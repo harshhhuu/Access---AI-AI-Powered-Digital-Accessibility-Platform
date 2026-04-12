@@ -241,15 +241,17 @@ Pick **one** pattern (document in README):
 
 ## Phase 8 — Parity, load, and failure modes
 
+**Status:** **`pnpm test`** (Vitest): contract tests (`test/contract.test.ts`), sign client + failure mapping (`test/sign-service-client.test.ts`), golden-style **`POST /api/sign/predict`** with mocked fetch + Prisma (`test/sign-predict.test.ts`). **`buildApp({ skipDatabaseHooks: true })`** for tests without Postgres. Optional **k6** smoke: `server/load/k6-simplify-smoke.js` + `load/README.md`.
+
 **Tasks:**
 
-- [ ] **Golden tests:** Saved vectors for sign → expected label/confidence (tolerance on confidence float).
-- [ ] **Contract tests:** HTTP status + JSON for auth errors, 404, validation errors.
-- [ ] **Load:** Optional k6/Artillery on `/api/simplify` and WS sign to ensure Node + Python pool sizing.
-- [ ] **Failure injection:** Python sign service down → Node returns 503 for sign routes consistent with today.
-- [ ] **Observability:** Structured logs (request id), metrics for HF latency and sign service latency.
+- [x] **Golden tests:** Saved vectors for sign → expected label/confidence (tolerance on confidence float). *(63-float vector + mocked upstream; asserts `sign` + `confidence` within `toBeCloseTo`.)*
+- [x] **Contract tests:** HTTP status + JSON for auth errors, 404, validation errors.
+- [x] **Load:** Optional k6/Artillery on `/api/simplify` and WS sign to ensure Node + Python pool sizing. *(k6 simplify smoke only; WS load documented as optional.)*
+- [x] **Failure injection:** Python sign service down → Node returns 503 for sign routes consistent with today. *(Covered by mocked fetch + `sign-service-client` tests + HTTP 503 body test.)*
+- [x] **Observability:** Structured logs (request id), metrics for HF latency and sign service latency. *(`genReqId` + `x-request-id` on response; `upstream` / `upstreamMs` in logs for HF simplify/describe/voice + sign inference.)*
 
-**Exit criteria:** Checklist signed off by QA or maintainer; no P0 parity gaps.
+**Exit criteria:** Checklist signed off by QA or maintainer; no P0 parity gaps. **Verified:** `pnpm run build`, `pnpm test`.
 
 ---
 

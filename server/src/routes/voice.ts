@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { FastifyPluginAsync } from "fastify";
 import { callHfWhisper } from "../lib/hf-voice.js";
 import { prisma } from "../lib/prisma.js";
+import { logUpstreamMs } from "../lib/upstream-log.js";
 
 function voiceCacheKey(audioBytes: Buffer): string {
   return createHash("sha256").update(Buffer.concat([Buffer.from("voice:", "utf8"), audioBytes])).digest("hex");
@@ -37,7 +38,9 @@ export const voiceRoutes: FastifyPluginAsync = async (app) => {
 
     let transcript: string;
     try {
+      const t0 = performance.now();
       transcript = await callHfWhisper(audioBytes);
+      logUpstreamMs(request.log, "hf_whisper", Math.round(performance.now() - t0));
     } catch (e) {
       const err = e as Error & { statusCode?: number };
       const msg = e instanceof Error ? e.message : String(e);
