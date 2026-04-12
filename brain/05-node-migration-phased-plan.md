@@ -177,17 +177,19 @@ flowchart TB
 
 ## Phase 5 — Image describe (`POST /api/describe`, `/api/describe/url`)
 
+**Status:** Implemented in `server/src/routes/describe.ts`, `hf-describe.ts`, `describe-local.ts` (sharp), `fetch-remote-image.ts`; `@fastify/multipart` + 5 MB limit; cache prefix `describe:v2:` + raw bytes (SHA-256); `HF_VISION_MODEL` in `server/.env`.
+
 **Goal:** Upload + URL fetch + cache + vision HF + PIL fallback parity.
 
 **Tasks:**
 
-- [ ] Multipart upload handling and size limits as in Python.
-- [ ] URL fetch: same validation (allowlist, max size, etc. — read `describe.py`).
-- [ ] Cache by content hash (same algorithm as Python).
-- [ ] HF vision call with same model env and retry policy.
-- [ ] **Fallback:** Reimplement PIL-based metadata description in Node (`sharp` + image-size / dominant color extraction) to match behavior as closely as possible; snapshot test tricky cases.
+- [x] Multipart upload handling and size limits as in Python.
+- [x] URL fetch: same validation (allowlist, max size, etc. — read `describe.py`).
+- [x] Cache by content hash (same algorithm as Python).
+- [x] HF vision call with same model env and retry policy.
+- [x] **Fallback:** Reimplement PIL-based metadata description in Node (`sharp` + image-size / dominant color extraction) to match behavior as closely as possible; snapshot test tricky cases.
 
-**Exit criteria:** Same inputs produce equivalent descriptions on cache hit; HF path tested with real token in staging.
+**Exit criteria:** Same inputs produce equivalent descriptions on cache hit; HF path tested with real token in staging. **Verified:** `pnpm run build`.
 
 ---
 

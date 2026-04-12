@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.12] — 2026-04-12
+
+- Phase 5 image describe on Node: `POST /api/describe`, `POST /api/describe/url` (multipart, sharp fallback, HF vision + 503 retry); `HF_VISION_MODEL` in `server/.env`. Updated `05-node-migration-phased-plan.md`, `server/README.md`.
+
 ## [brain-0.1.11] — 2026-04-12
 
 - Removed `frontend/.env.example`, `server/.env.example`, and `services/sign-inference/.env.example`; docs now reference tracked `.env` files and `.env.local` overrides.

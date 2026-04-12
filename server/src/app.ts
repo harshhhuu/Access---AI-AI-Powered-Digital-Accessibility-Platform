@@ -2,6 +2,7 @@ import cors from "@fastify/cors";
 import Fastify, { type FastifyInstance } from "fastify";
 import { prisma } from "./lib/prisma.js";
 import { authRoutes } from "./routes/auth.js";
+import { describeRoutes } from "./routes/describe.js";
 import { simplifyRoutes } from "./routes/simplify.js";
 
 function parseOrigins(): string[] {
@@ -33,6 +34,7 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(simplifyRoutes, { prefix: "/api" });
+  await app.register(describeRoutes, { prefix: "/api" });
 
   app.addHook("onReady", async () => {
     await prisma.$queryRaw`SELECT 1`;
