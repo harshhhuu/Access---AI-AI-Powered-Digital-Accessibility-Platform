@@ -25,9 +25,9 @@ build/
 coverage/
 .nyc_output
 
-# Environment (`.env` is tracked; local overrides stay in `.env.local`)
-.env.*
-!.env.example
+# Tracked: `.env`, `.env.example`. Ignore local-only overrides.
+.env.local
+.env.*.local
 
 # Editor files
 .vscode/*

@@ -1,6 +1,6 @@
 # AccessAI Node API (migration)
 
-**Fastify** + **Prisma** + **TypeScript**. Phase 2 added `GET /health` and DB; **Phase 3** added **`/auth/*`** (register, login, me, preferences) compatible with `backend/auth.py` and `backend/routers/auth.py` (JWT HS256, bcrypt, same JSON shapes).
+**Fastify** + **Prisma** + **TypeScript**. Phase 2 added `GET /health` and DB; **Phase 3** added **`/auth/*`** (register, login, me, preferences). **Phase 4** added **`POST /api/simplify`** (cache + Hugging Face), matching `backend/routers/simplify.py`.
 
 ## Prerequisites
 
@@ -34,6 +34,7 @@ pnpm dev
 
 - Health: `GET http://localhost:8000/health` → `{"status":"ok","message":"AccessAI API is running"}`
 - Auth: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `PUT /auth/preferences` (Bearer token)
+- Simplify: `POST /api/simplify` — body `{ "text": string, "grade_level"?: number }` (default grade 5); requires `HF_API_TOKEN` (and optional `HF_TEXT_MODEL`) like the Python backend
 
 Use `PORT=8001` in `.env` if the Python backend still uses 8000.
 
@@ -46,6 +47,8 @@ Use `PORT=8001` in `.env` if the Python backend still uses 8000.
 | `ALGORITHM` | Default `HS256` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Default `1440` |
 | `FRONTEND_URL` | CORS allowlist |
+| `HF_API_TOKEN` | Hugging Face Router token (required for `/api/simplify`) |
+| `HF_TEXT_MODEL` | Defaults to `Qwen/Qwen2.5-72B-Instruct:novita` |
 | `PORT` / `HOST` | Listen address (default `8000` / `0.0.0.0`) |
 
 ## Scripts

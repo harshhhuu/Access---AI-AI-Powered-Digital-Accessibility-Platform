@@ -157,17 +157,21 @@ flowchart TB
 
 ## Phase 4 — Cognitive simplifier (`POST /api/simplify`)
 
+**Status:** Implemented in `server/src/routes/simplify.ts`, `server/src/lib/hf-simplify.ts`, `server/src/lib/word-count.ts` — SHA-256 cache key `simplify:{grade}:{text}`, Hugging Face chat completions + 20s retry on 503, 60s timeout, `HF_TEXT_MODEL` default matches Python.
+
 **Goal:** Same caching and HF behavior.
 
 **Tasks:**
 
-- [ ] Port validation: max text length, `grade_level` allowed values (3/5/8 or as in code).
-- [ ] **Cache key:** Same hash algorithm as Python (inspect `simplify.py` — likely SHA-256 of text + grade + endpoint name).
-- [ ] Read/write `api_cache` table (`endpoint`, `input_hash`, `grade_level`, `output_text`).
-- [ ] **Hugging Face:** Same base URL, model id, headers (`HF_API_TOKEN`), retries on 503 (cold start), timeouts.
-- [ ] Response: `simplified`, `word_count_before`, `word_count_after`, `cached`.
+- [x] Port validation: max text length, `grade_level` allowed values (3/5/8 or as in code).
+- [x] **Cache key:** Same hash algorithm as Python (inspect `simplify.py` — likely SHA-256 of text + grade + endpoint name).
+- [x] Read/write `api_cache` table (`endpoint`, `input_hash`, `grade_level`, `output_text`).
+- [x] **Hugging Face:** Same base URL, model id, headers (`HF_API_TOKEN`), retries on 503 (cold start), timeouts.
+- [x] Response: `simplified`, `word_count_before`, `word_count_after`, `cached`.
 
-**Exit criteria:** Cache hit returns identical text; miss matches Python on same input (allowing for remote model nondeterminism — document if strict equality is impossible).
+**Exit criteria:** Cache hit returns identical text; miss matches Python on same input (allowing for remote model nondeterminism — document if strict equality is impossible). **Verified:** `400` over 5000 chars; `502` when `HF_API_TOKEN` missing; `pnpm run build` passes. **Note:** Python does not restrict `grade_level` to 3/5/8 — Node matches that (any integer).
+
+**Clarification on task “3/5/8”:** The UI uses 3/5/8; the API accepts any integer grade in the prompt, same as FastAPI.
 
 ---
 

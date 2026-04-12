@@ -2,6 +2,14 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.10] — 2026-04-12
+
+- Version `backend/.env`, `server/.env`, and `frontend/.env`; stop gitignoring package `.env` files; ignore `**/.env.local` only; CORS adds `localhost:5174`. Phase 4 simplify routes committed with HF helpers.
+
+## [brain-0.1.9] — 2026-04-12
+
+- Phase 4 cognitive simplifier on Node: `POST /api/simplify` with Prisma `api_cache`, SHA-256 key parity, Hugging Face chat completions + 503 retry (`server/src/routes/simplify.ts`, `hf-simplify.ts`). Updated `server/.env.example`, `server/README.md`, `05-node-migration-phased-plan.md`.
+
 ## [brain-0.1.8] — 2026-04-12
 
 - Phase 3 auth on Node: `POST/GET/PUT /auth/*` in `server/` (bcrypt, JWT HS256, FastAPI-shaped `detail` errors). Updated `server/README.md`, `server/.env.example`, `05-node-migration-phased-plan.md`.
