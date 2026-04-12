@@ -101,18 +101,20 @@ flowchart TB
 
 ## Phase 1 — Extract the Python sign microservice
 
+**Status:** Implemented in `services/sign-inference/` (FastAPI on port **9001**, `POST /predict`, `GET /health`, optional `MODEL_PATH`, Dockerfile, `README.md`). See `brain/02-local-dev.md` for run commands.
+
 **Goal:** A runnable process that **only** loads `sign_model.h5` and exposes predict — **no** DB, **no** JWT, **no** Hugging Face.
 
 **Tasks:**
 
-- [ ] Copy `backend/ml/sign_model.py`, `backend/ml/sign_labels.py`, and model path convention (`models/sign_model.h5`) into the new service (or mount the same volume in Docker).
-- [ ] Preload model on startup (mirror current `lifespan` warmup).
-- [ ] Implement `POST /predict` (or `/internal/predict`): validate 63 floats; return `{ sign, confidence }`; map `FileNotFoundError` and TF errors to 503 with messages similar to today’s `sign.py`.
-- [ ] Add health route `GET /health` for orchestration (returns `ok` when model loaded or explicit “degraded” if you allow start without model).
-- [ ] **Dockerfile** (optional but recommended): pinned Python + TensorFlow CPU, non-root user, model path via env.
-- [ ] **Local run doc:** `uvicorn` command and port (e.g. `9001`).
+- [x] Copy `backend/ml/sign_model.py`, `backend/ml/sign_labels.py`, and model path convention (`models/sign_model.h5`) into the new service (or mount the same volume in Docker).
+- [x] Preload model on startup (mirror current `lifespan` warmup).
+- [x] Implement `POST /predict` (or `/internal/predict`): validate 63 floats; return `{ sign, confidence }`; map `FileNotFoundError` and TF errors to 503 with messages similar to today’s `sign.py`.
+- [x] Add health route `GET /health` for orchestration (returns `ok` when model loaded or explicit “degraded” if you allow start without model).
+- [x] **Dockerfile** (optional but recommended): pinned Python + TensorFlow CPU, non-root user, model path via env.
+- [x] **Local run doc:** `uvicorn` command and port (e.g. `9001`).
 
-**Exit criteria:** `curl` to Python service returns predictions for a fixed test vector; matches current FastAPI output for the same landmarks (side-by-side script).
+**Exit criteria:** `curl` to Python service returns predictions for a fixed test vector; matches current FastAPI output for the same landmarks (side-by-side script). **Verified:** health `degraded` without `.h5`; health `ok` + `POST /predict` 200 with a generated dummy `.h5` (`temp/generate_dummy_sign_model.py`); `400` on wrong landmark count.
 
 ---
 

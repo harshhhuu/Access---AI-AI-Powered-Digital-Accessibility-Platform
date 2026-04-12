@@ -25,6 +25,21 @@ cd frontend && pnpm install && pnpm dev
 
 PostgreSQL must match `DATABASE_URL` (host, port, database name, credentials). Tables are created on API startup.
 
+## Sign inference service (Phase 1 migration)
+
+The standalone Python service for TensorFlow sign prediction lives in `services/sign-inference/`. It listens on **9001** by default and is separate from the main FastAPI app on 8000.
+
+```bash
+cd services/sign-inference
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+# Optional: place sign_model.h5 in models/, or set MODEL_PATH
+PYTHONPATH=. uvicorn app.main:app --host 127.0.0.1 --port 9001
+```
+
+- `GET http://127.0.0.1:9001/health` — `model_loaded` is false until `models/sign_model.h5` exists (or `MODEL_PATH` points to a file).
+- For a **local smoke test** without the real model, you can generate a tiny placeholder (not for production): `python temp/generate_dummy_sign_model.py` (writes `services/sign-inference/models/sign_model.h5`, gitignored).
+
 ## PostgreSQL via Docker (optional)
 
 If Docker Desktop is running, from the repo root:

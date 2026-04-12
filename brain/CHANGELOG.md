@@ -6,6 +6,10 @@ Versioned record of knowledge-base and process changes. Newest first.
 
 - Stop ignoring `frontend/.env` in root and `frontend/.gitignore` so default Vite API/WebSocket URLs can be versioned (same values as `.env.example`; `backend/.env` and `.env.local` remain ignored).
 
+## [brain-0.1.4] — 2026-04-12
+
+- Implemented Phase 1 sign-inference microservice (`services/sign-inference/`): FastAPI `POST /predict`, `GET /health`, Dockerfile, README; documented run and dummy-model smoke test in `02-local-dev.md`; marked Phase 1 complete in `05-node-migration-phased-plan.md`. Root `.gitignore` ignores `services/sign-inference/.venv/` and `models/*.h5`.
+
 ## [brain-0.1.3] — 2026-04-12
 
 - Added phased implementation plan for full backend migration with a dedicated Python sign-inference service (`05-node-migration-phased-plan.md`); indexed `04-features-and-stack` and the new plan in `00-index.md`.

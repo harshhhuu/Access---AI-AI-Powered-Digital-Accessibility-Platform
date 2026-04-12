@@ -1,4 +1,6 @@
 backend/.env
+services/sign-inference/.venv/
+services/sign-inference/models/*.h5
 .env.local
 __pycache__/
 *.pyc
