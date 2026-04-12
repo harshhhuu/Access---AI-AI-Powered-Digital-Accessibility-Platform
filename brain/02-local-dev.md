@@ -10,6 +10,23 @@
 
 Use local-only overrides in `.env.local` (gitignored). Backend details: `backend/README.md`.
 
+## Run everything (Node API + sign-inference + frontend + Postgres)
+
+From the **repository root** (requires `services/sign-inference/.venv` — see sign-inference section below):
+
+```bash
+pnpm install
+pnpm dev
+```
+
+This runs `scripts/dev-all.sh`: starts **Docker Postgres** (`docker compose up -d` when Docker is available), then **concurrently** — sign-inference on **9001**, Node API in `server/` (default **8001** from `server/.env`), Vite in `frontend/`. Use **Ctrl+C** to stop all processes; Postgres keeps running until `docker compose down`.
+
+First-time **Prisma client** (if you have not built the server yet):
+
+```bash
+pnpm --dir server exec prisma generate
+```
+
 ## Run commands
 
 **Backend** (from `backend/`, with venv activated):

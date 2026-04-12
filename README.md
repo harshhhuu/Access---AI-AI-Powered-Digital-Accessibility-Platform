@@ -204,6 +204,20 @@ cd accessai
 
 ---
 
+## Full stack (Node API + sign + frontend + Postgres)
+
+From the repo root, with [pnpm](https://pnpm.io/) and a Python venv in `services/sign-inference/.venv` (see `brain/02-local-dev.md`):
+
+```bash
+pnpm install
+pnpm --dir server exec prisma generate   # first time only
+pnpm dev
+```
+
+This runs **Docker Postgres** (if Docker is running), **sign-inference** on port 9001, the **Node API** in `server/` (port from `server/.env`, usually 8001), and the **Vite** dev server. Stop child processes with Ctrl+C.
+
+---
+
 # 🔧 Backend Setup
 
 ```
