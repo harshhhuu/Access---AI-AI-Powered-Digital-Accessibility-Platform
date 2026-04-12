@@ -3,9 +3,9 @@
 **AI-Powered Accessibility Platform**
 
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
-[![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
+[![Node](https://img.shields.io/badge/node.js-server-339933)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/react-frontend-61dafb)](https://react.dev/)
-[![FastAPI](https://img.shields.io/badge/backend-fastapi-009688)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/python-sign--ml-3776AB)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/database-postgresql-336791)](https://www.postgresql.org/)
 [![Hackathon](https://img.shields.io/badge/hackathon-NMIMS%202026-orange)]()
 
@@ -126,19 +126,20 @@ flowchart LR
 
 User[User Browser]
 Frontend[React Frontend]
-Backend[FastAPI Backend]
+API[Node API]
+Sign[Sign inference Python]
 Database[(PostgreSQL)]
 AI[HuggingFace AI APIs]
 Vision[MediaPipe]
 Model[TensorFlow Sign Model]
 
 User --> Frontend
-Frontend --> Backend
-Backend --> Database
-Backend --> AI
+Frontend --> API
+API --> Database
+API --> AI
+API --> Sign
 Frontend --> Vision
 Vision --> Model
-Model --> Backend
 ```
 
 ---
@@ -151,17 +152,19 @@ Model --> Backend
 * Vite
 * TailwindCSS
 
-### Backend
+### API
 
-* FastAPI
-* Python
+* Node.js (Fastify + Prisma) — `server/`
 * WebSockets
+
+### Sign ML (internal service)
+
+* Python + TensorFlow — `services/sign-inference/`
 
 ### AI / Machine Learning
 
-* TensorFlow
-* MediaPipe
-* HuggingFace Models
+* TensorFlow / MediaPipe (browser + sign service)
+* Hugging Face (text, vision, voice)
 
 ### Database
 
@@ -174,12 +177,12 @@ Model --> Backend
 ```
 accessai
 │
-├── backend
-│   ├── routers
-│   ├── models
-│   ├── ml
-│   ├── database.py
-│   └── main.py
+├── server
+│   ├── src
+│   └── prisma
+│
+├── services/sign-inference
+│   └── app
 │
 ├── frontend
 │   ├── src
@@ -220,40 +223,19 @@ This runs **Docker Postgres** (if Docker is running), **sign-inference** on port
 
 ---
 
-# 🔧 Backend Setup
+# 🔧 API (Node) setup
 
-```
-cd backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-```
+See **`server/README.md`** for Prisma, env vars, and routes. Quick start:
 
-Create `.env`
-
-```
-DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/accessai
-HF_API_TOKEN=hf_your_token_here
-SECRET_KEY=your_secret_key
+```bash
+cd server
+pnpm install
+pnpm exec prisma generate
+pnpm run db:migrate:dev   # or migrate deploy
+pnpm dev
 ```
 
-Start backend
-
-```
-python -m uvicorn main:app --reload
-```
-
-Backend runs at
-
-```
-http://localhost:8000
-```
-
-API docs
-
-```
-http://localhost:8000/docs
-```
+Default URL: **`http://localhost:8001`** (set `PORT` in `server/.env`).
 
 ---
 
@@ -261,8 +243,8 @@ http://localhost:8000/docs
 
 ```
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Frontend runs at
@@ -275,19 +257,13 @@ http://localhost:5173
 
 # 🧪 Testing
 
-Backend smoke test:
+API unit tests (from `server/`):
 
-```
-cd backend
-venv\Scripts\activate
-python smoke_test.py
+```bash
+cd server && pnpm test
 ```
 
-Manual API testing:
-
-```
-http://localhost:8000/docs
-```
+Manual check: **`GET http://localhost:8001/health`**
 
 ---
 

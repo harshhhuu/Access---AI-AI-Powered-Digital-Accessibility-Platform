@@ -274,11 +274,15 @@ Pick **one** pattern (document in README):
 
 ## Phase 10 — Decommission FastAPI monolith
 
+**Status:** The **`backend/`** FastAPI monolith **has been removed** from the repository. **`services/sign-inference/`** remains the only Python service for Keras sign inference. **`brain/01-project-overview.md`**, **`brain/04-features-and-stack.md`**, **`brain/02-local-dev.md`**, **`brain/03-backend-python-to-node-migration.md`**, root **`README.md`**, **`frontend/README.md`**, **`deploy/README.md`**, and **`server/README.md`** updated for Node-first docs. **`brain-0.1.18`** changelog entry.
+
 **Tasks:**
 
-- [ ] delete `backend/` Python **monolith** code paths; **keep** `services/sign-inference/` (or equivalent) as the only Python.
-- [ ] Update `brain/01-project-overview.md`, `brain/04-features-and-stack.md`, `brain/02-local-dev.md`, root `README.md`.
-- [ ] Brain changelog entry for migration complete.
+- [x] delete `backend/` Python **monolith** code paths; **keep** `services/sign-inference/` (or equivalent) as the only Python.
+- [x] Update `brain/01-project-overview.md`, `brain/04-features-and-stack.md`, `brain/02-local-dev.md`, root `README.md`.
+- [x] Brain changelog entry for migration complete.
+
+**Exit criteria:** No FastAPI monolith in tree; contributors run **`server/`** + **`services/sign-inference/`** only.
 
 ---
 

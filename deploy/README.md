@@ -12,9 +12,9 @@ Convenience script (Compose API + Vite on host): `pnpm dev:docker` from the repo
 
 ## Rollback (high level)
 
-1. Point **`VITE_API_BASE_URL`** / **`VITE_WS_URL`** (or DNS) back to the previous FastAPI host.
-2. Redeploy or start the **Python monolith** (`backend/`) if it was the prior production API.
-3. Keep **Postgres** data; schema is shared with Prisma migrations.
+1. Point **`VITE_API_BASE_URL`** / **`VITE_WS_URL`** (or DNS) back to a **previous Node API** deployment (image tag / git revision) if a release regresses.
+2. The legacy **FastAPI monolith** was removed in Phase 10; rollback to it would require **restoring `backend/` from git history** (pre–Phase 10 commit), not a supported path for new work.
+3. Keep **Postgres** data; schema is managed by Prisma migrations in `server/prisma/`.
 
 ## Blue/green or canary
 

@@ -5,12 +5,11 @@ Small, focused notes for the AccessAI repo. Add new topics as `NN-short-name.md`
 | Doc | Topic |
 | --- | --- |
 | [01-project-overview](01-project-overview.md) | Product intent, repo layout, main stack |
-| [02-local-dev](02-local-dev.md) | Env file locations and how to run backend, frontend, and sign-inference |
+| [02-local-dev](02-local-dev.md) | Env file locations and how to run Node API, frontend, and sign-inference |
 | [04-features-and-stack](04-features-and-stack.md) | How each feature works and what we use (stack + services) |
-| [03-backend-python-to-node-migration](03-backend-python-to-node-migration.md) | Checklist: migrating API from Python/FastAPI to Node |
-| [04-features-and-stack](04-features-and-stack.md) | Features and technology stack (end-to-end) |
+| [03-backend-python-to-node-migration](03-backend-python-to-node-migration.md) | Historical checklist (migration complete; monolith removed) |
 | [05-node-migration-phased-plan](05-node-migration-phased-plan.md) | Phased implementation plan: Node API + Python sign service |
-| [server/README.md](../server/README.md) | Node Fastify + Prisma API (migration shell) |
+| [server/README.md](../server/README.md) | Node Fastify + Prisma API |
 | [deploy/README.md](../deploy/README.md) | Phase 9 Compose stack, rollback / canary notes |
 
 ## Conventions

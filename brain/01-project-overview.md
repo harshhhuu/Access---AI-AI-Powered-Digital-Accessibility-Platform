@@ -6,8 +6,8 @@
 
 | Path | Role |
 | --- | --- |
-| `backend/` | FastAPI + PostgreSQL API and services (being migrated) |
-| `server/` | Node.js FastAPI successor — Fastify + Prisma (see migration plan) |
+| `server/` | **Primary HTTP API** — Fastify + Prisma + TypeScript, PostgreSQL |
+| `services/sign-inference/` | Python microservice — TensorFlow sign prediction (`POST /predict`); called only by Node (`SIGN_SERVICE_URL`) |
 | `frontend/` | React web app |
 | `extension/` | Browser extension |
 | `docs/` | Images and supplementary docs |
@@ -15,7 +15,8 @@
 
 ## Tech stack (high level)
 
-- **Backend:** Python 3.11, FastAPI, PostgreSQL (legacy monolith); **Node** (Fastify + Prisma) in `server/` for the migration
+- **API:** Node.js (Fastify + Prisma), PostgreSQL
+- **Sign ML (server-side):** Python 3.11 + TensorFlow in `services/sign-inference/` (not exposed to browsers directly)
 - **Frontend:** React (see `frontend/package.json` for versions)
 - **AI / media:** CV, speech, and NLP pipelines as described in the root `README.md`
 

@@ -4,11 +4,10 @@
 
 | Location | Purpose |
 | --- | --- |
-| `backend/.env` | `DATABASE_URL`, Hugging Face models/tokens, JWT `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
-| `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` |
-| `server/.env` | `DATABASE_URL`, JWT, `FRONTEND_URL`, `HF_*`, **`SIGN_SERVICE_URL`** (Python sign-inference, e.g. `http://127.0.0.1:9001`), optional `PORT` / `HOST` — align JWT with `backend/.env` when testing both APIs |
+| `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` (default Node API **8001**) |
+| `server/.env` | `DATABASE_URL`, JWT, `FRONTEND_URL`, `HF_*`, **`SIGN_SERVICE_URL`** (Python sign-inference, e.g. `http://127.0.0.1:9001`), optional `PORT` / `HOST` |
 
-Use local-only overrides in `.env.local` (gitignored). Backend details: `backend/README.md`.
+Use local-only overrides in `.env.local` (gitignored). API details: `server/README.md`.
 
 ## Run everything (Node API + sign-inference + frontend + Postgres)
 
@@ -31,38 +30,32 @@ pnpm --dir server exec prisma generate
 
 ## Run commands
 
-**Backend** (from `backend/`, with venv activated):
-
-```bash
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
 **Frontend** (pnpm):
 
 ```bash
 cd frontend && pnpm install && pnpm dev
 ```
 
-PostgreSQL must match `DATABASE_URL` (host, port, database name, credentials). Tables are created on API startup.
+PostgreSQL must match `DATABASE_URL` in `server/.env` (host, port, database name, credentials). Schema is managed with **Prisma migrations** (`server/prisma/`).
 
-## Node API (Phase 2 migration)
+## Node API
 
-The Fastify + Prisma app in `server/` is the future main API. It exposes `GET /health`, **`/auth/*`** (register, login, me, preferences), and connects to the same PostgreSQL schema as the Python backend.
+The Fastify + Prisma app in `server/` is the **main API**. It exposes `GET /health`, **`/auth/*`**, **`/api/*`**, and **`WebSocket /ws/sign`** (proxied to sign-inference).
 
 ```bash
 cd server
 pnpm install
 pnpm exec prisma generate
 # Empty DB: pnpm run db:migrate:dev
-# DB already used by Python: see `server/README.md` (baseline `migrate resolve`)
+# DB from an older setup: see `server/README.md` (baseline `migrate resolve`)
 pnpm dev
 ```
 
-Use `PORT=8001` in `server/.env` if you still run the Python app on 8000. Point the frontend at `http://localhost:8001` and **`VITE_WS_URL=ws://localhost:8001`** when testing the **Node** API end-to-end (including **`/ws/sign`**, which Node proxies to `SIGN_SERVICE_URL`). If you still use FastAPI on 8000 for WebSocket sign only, you can keep `VITE_WS_URL=ws://localhost:8000` until cutover.
+Point the frontend at **`http://localhost:8001`** and **`VITE_WS_URL=ws://localhost:8001`** (see `frontend/.env`).
 
-## Sign inference service (Phase 1 migration)
+## Sign inference service
 
-The standalone Python service for TensorFlow sign prediction lives in `services/sign-inference/`. It listens on **9001** by default and is separate from the main FastAPI app on 8000.
+The standalone Python service for TensorFlow sign prediction lives in `services/sign-inference/`. It listens on **9001** by default. The **browser never calls it directly**; the Node server forwards to **`SIGN_SERVICE_URL`**.
 
 ```bash
 cd services/sign-inference
@@ -83,4 +76,4 @@ If Docker Desktop is running, from the repo root:
 docker compose up -d
 ```
 
-This starts `postgres:16-alpine` on port **5433** with user `postgres`, password `root`, database `accessai` — aligned with the sample `DATABASE_URL` in `backend/README.md` and typical local `.env` files. Stop with `docker compose down`.
+This starts `postgres:16-alpine` on port **5433** with user `postgres`, password `root`, database `accessai` — aligned with typical `DATABASE_URL` values in `server/.env`. Stop with `docker compose down`.

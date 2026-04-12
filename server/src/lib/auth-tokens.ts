@@ -7,7 +7,7 @@ function secret(): string {
 function algorithm(): jwt.Algorithm {
   const a = process.env.ALGORITHM ?? "HS256";
   if (a !== "HS256") {
-    throw new Error(`Unsupported ALGORITHM: ${a} (Python backend uses HS256)`);
+    throw new Error(`Unsupported ALGORITHM: ${a} (use HS256)`);
   }
   return "HS256";
 }
@@ -16,7 +16,7 @@ function expireMinutes(): number {
   return parseInt(process.env.ACCESS_TOKEN_EXPIRE_MINUTES ?? "1440", 10);
 }
 
-/** Matches `auth.create_access_token` in backend (python-jose): `sub` is string user id, `exp` from UTC now + minutes. */
+/** JWT access token: `sub` is string user id, `exp` from UTC now + minutes (legacy FastAPI parity). */
 export function createAccessToken(payload: { sub: string }): string {
   return jwt.sign(payload, secret(), {
     algorithm: algorithm(),

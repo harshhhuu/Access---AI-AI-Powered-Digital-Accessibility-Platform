@@ -1,4 +1,4 @@
-// PostgreSQL schema aligned with backend/models.py (SQLAlchemy) for migration parity.
+// PostgreSQL schema for AccessAI (users, api_cache, sign_logs).
 
 generator client {
   provider = "prisma-client-js"

@@ -1,6 +1,6 @@
 import { setTimeout as delay } from "node:timers/promises";
 
-/** Same endpoint as `backend/routers/voice.py` */
+/** Hugging Face Whisper Router endpoint (parity with original FastAPI behavior). */
 const HF_URL = "https://router.huggingface.co/hf-inference/models/openai/whisper-large-v3";
 
 const MAX_RETRIES = 3;
@@ -13,7 +13,7 @@ function hfHeaders(): Record<string, string> {
   return { Authorization: `Bearer ${token}`, "Content-Type": "audio/wav" };
 }
 
-/** Raw POST body; HF expects `Content-Type: audio/wav` per Python backend. */
+/** Raw POST body; HF expects `Content-Type: audio/wav`. */
 export async function callHfWhisper(audioBytes: Buffer, retry = 0): Promise<string> {
   const r = await fetch(HF_URL, {
     method: "POST",

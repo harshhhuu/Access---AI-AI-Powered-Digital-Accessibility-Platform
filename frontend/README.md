@@ -32,10 +32,9 @@ Generates descriptions of images for visually impaired users.
 - Tailwind CSS
 - TensorFlow.js
 
-### Backend
-- FastAPI
+### API (see repo root / `server/`)
+- Node.js (Fastify + Prisma)
 - PostgreSQL
-- SQLAlchemy
 
 ### AI
 - MediaPipe
@@ -44,11 +43,9 @@ Generates descriptions of images for visually impaired users.
 
 ## Installation
 
-### Backend
-
 ### Frontend
 1. Use `frontend/.env` (tracked) or a local `.env.local` for overrides. Set:
-   - `VITE_API_BASE_URL=http://localhost:8000`
-   - `VITE_WS_URL=ws://localhost:8000`
-3. Install dependencies with `npm install`
-4. Run the frontend with `npm run dev`
+   - `VITE_API_BASE_URL=http://localhost:8001`
+   - `VITE_WS_URL=ws://localhost:8001`
+2. Install dependencies with `pnpm install` (or `npm install`)
+3. Run the frontend with `pnpm dev` (or `npm run dev`)

@@ -1,6 +1,6 @@
 import sharp from "sharp";
 
-/** Match `describe_image_locally` in `backend/routers/describe.py` (PIL). */
+/** Local image metadata fallback (parity with original PIL-based describe). */
 export async function describeImageLocally(imageBytes: Buffer): Promise<string> {
   let metadata: sharp.Metadata;
   try {

@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.18] — 2026-04-12
+
+- Phase 10 decommission: removed the FastAPI **`backend/`** monolith; **`services/sign-inference/`** is the only Python service. Updated **`brain/01-project-overview.md`**, **`brain/02-local-dev.md`**, **`brain/04-features-and-stack.md`**, **`brain/03-backend-python-to-node-migration.md`**, **`brain/05-node-migration-phased-plan.md`**, root **`README.md`**, **`frontend/README.md`**, **`deploy/README.md`**, **`server/README.md`**, **`server/.env`** header; server comments no longer reference removed paths.
+
 ## [brain-0.1.17] — 2026-04-12
 
 - Phase 9 deployment: Docker Compose profile `fullstack` (Postgres + internal sign-inference + Node API on 8001), `server/Dockerfile` + `docker-entrypoint.sh` (Prisma migrate deploy); `deploy/README.md`; `pnpm dev:docker` and `dev-all.sh --docker`; frontend API/WS defaults → Node 8001. Updated `05-node-migration-phased-plan.md`, `02-local-dev.md`, `README.md`, `server/README.md`.

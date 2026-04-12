@@ -27,7 +27,7 @@ function stripOuterDoubleQuotes(s: string): string {
 }
 
 /**
- * Same contract as `call_hf_simplify` in `backend/routers/simplify.py`:
+ * Same contract as the original FastAPI simplify HF helper:
  * retry once after 20s on HTTP 503.
  */
 export async function callHfSimplify(text: string, gradeLevel: number): Promise<string> {

@@ -9,65 +9,54 @@ How the main product areas work end-to-end and which libraries or services they 
 | Layer | Technology |
 | --- | --- |
 | Web UI | React 19, Vite 7, React Router 7, Tailwind CSS 4, shadcn-style UI (Radix, CVA, `tailwind-merge`) |
-| HTTP client | Axios (`VITE_API_BASE_URL`, default `http://localhost:8001` for Node API) |
-| Real-time (sign) | WebSocket `ws://…/ws/sign` (`VITE_WS_URL` + path) |
-| Backend API | FastAPI (Python), Uvicorn, SQLAlchemy, PostgreSQL |
-| ML (server) | TensorFlow (Keras) for sign language `.h5`; NumPy |
+| HTTP client | Axios (`VITE_API_BASE_URL`, default `http://localhost:8001`) |
+| Real-time (sign) | WebSocket `ws://…/ws/sign` (`VITE_WS_URL` + path) — served by **Node**, which proxies to **sign-inference** |
+| Backend API | **Node** (Fastify + Prisma + PostgreSQL) in `server/` |
+| Sign ML (internal) | Python **`services/sign-inference/`** — TensorFlow Keras `sign_model.h5`, `POST /predict` |
 | ML (browser) | TensorFlow.js, `@tensorflow-models/hand-pose-detection`, `@mediapipe/hands` (hand landmarks) |
 | External AI | Hugging Face Inference / Router (`HF_API_TOKEN`, models via env) |
 | Auth | JWT (`SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`), bcrypt passwords |
 | P2P video | PeerJS (WebRTC) on the Video Call page |
 | Browser extension | Chrome MV3 (service worker, content scripts) |
 
-Environment variables live in `backend/.env` and `frontend/.env` (see `backend/README.md` and `brain/02-local-dev.md`).
+Environment variables: **`server/.env`** (API + secrets) and **`frontend/.env`** (public API/WS base URLs). See `brain/02-local-dev.md`.
 
 ---
 
-## Backend (FastAPI)
+## Backend API (Node — `server/`)
 
 ### Health
 
-- **`GET /health`** — lightweight ping (useful if the host sleeps idle tiers).
+- **`GET /health`** — lightweight ping.
 
 ### Auth (`/auth`)
 
 - **`POST /auth/register`**, **`POST /auth/login`** — email + password; returns JWT `access_token`.
 - **`GET /auth/me`**, **`PUT /auth/preferences`** — protected routes; preferences stored on the user record.
 
-Uses PostgreSQL via SQLAlchemy; passwords hashed with bcrypt.
+Uses PostgreSQL via Prisma; passwords hashed with bcrypt.
 
 ### Cognitive text simplifier (`POST /api/simplify`)
 
-- **Purpose:** Rewrite long or formal text at a chosen reading level (e.g. grade 3 / 5 / 8).
-- **Flow:** Validates length → checks **PostgreSQL cache** (hash of text + grade) → if miss, calls **Hugging Face chat completions** (`HF_TEXT_MODEL`, default `Qwen/Qwen2.5-72B-Instruct:novita` via `router.huggingface.co`) → stores result in cache → returns simplified text and word counts.
-- **Retries:** On HTTP 503 (model cold start), waits and retries similarly to other HF routes.
+Validates length → **PostgreSQL cache** (hash) → Hugging Face chat completions → cache write → response with word counts. Retries on HF cold starts (503).
 
-### Image description (`/api/describe` …)
+### Image description (`POST /api/describe`, `/api/describe/url`)
 
-- **Purpose:** Short natural-language description of an image for blind/low-vision users.
-- **Flow:** Image bytes → cache lookup by content hash → **Hugging Face vision chat** (`HF_VISION_MODEL`, e.g. `CohereLabs/aya-vision-32b:cohere`) → cache write. If the remote call fails with certain errors, a **local PIL-based fallback** (size, rough color, orientation) may be used.
-- Supports **upload** and **URL** variants (server fetches remote images with validation).
+Image bytes → cache → HF vision → cache. On certain failures, **sharp**-based local metadata fallback (parity with prior PIL behavior).
 
-### Voice / transcription (`/api/voice` …)
+### Voice (`POST /api/voice`)
 
-- **Purpose:** Transcribe audio when the browser cannot do speech recognition locally.
-- **Flow:** Audio upload → **Hugging Face Whisper** (`openai/whisper-large-v3` on the HF inference endpoint used in code), with retries on cold starts.
+Audio → HF Whisper (`openai/whisper-large-v3` via Router), with retries; cached by content hash.
 
-### Sign language (`/api/sign/predict` + **`WebSocket /ws/sign`**)
+### Sign language (`POST /api/sign/predict` + **`WebSocket /ws/sign`**)
 
-- **Purpose:** Map **63 hand landmark floats** (21 points × x/y/z, wrist-normalised) to a **label** (e.g. hello, yes, help).
-- **Server:** TensorFlow Keras model `backend/models/sign_model.h5` loaded via `ml/sign_model.py`; **`predict()`** returns `{ sign, confidence }`.
-- **WebSocket:** Client sends JSON `{ "landmarks": [ … 63 floats ] }`; server responds with prediction JSON. Used for continuous webcam pipelines.
-- **HTTP:** Same model for single-shot / testing.
-
-### Startup
-
-- Preloads the sign Keras model when possible.
-- **`Base.metadata.create_all`** ensures DB tables exist.
+- **Purpose:** Map **63 hand landmark floats** to a **label** (e.g. hello, yes, help).
+- **Inference:** Node forwards to **`services/sign-inference`** (`SIGN_SERVICE_URL`). Keras model lives under **`services/sign-inference/models/`** (not in the repo unless you add `sign_model.h5`).
+- **WebSocket:** Client sends `{ "landmarks": [ … 63 floats ] }`; Node proxies to Python and returns prediction JSON. HTTP path can write **`sign_logs`**; WebSocket does not log each frame.
 
 ### CORS
 
-- Allows local dev origins (`localhost:5173`, etc.) and `FRONTEND_URL` from env for deployment.
+Allows local dev origins and `FRONTEND_URL` from env.
 
 ---
 
@@ -76,37 +65,29 @@ Uses PostgreSQL via SQLAlchemy; passwords hashed with bcrypt.
 ### Routes (typical)
 
 - **Home** — marketing / entry to features.
-- **`/simplify`** — Cognitive text simplifier: calls **`simplifyText()`** → `POST /api/simplify`. If the API fails, a **demo article + cached outputs** can still work offline for demos.
-- **`/image`** (`ImageDescribe`) — upload or URL; **`describeImage` / `describeImageByUrl`** → describe API.
-- **`/sign`** — Sign language: webcam + **MediaPipe Hands** (browser) for landmarks; optional **TF.js graph model** in `public/models/sign_model/` for on-device classification; **WebSocket** to backend for server-side predictions; TTS for feedback.
-- **`/voice`** — **Voice Navigator:** **Web Speech API** (`SpeechRecognition` / `webkitSpeechRecognition`) in `useVoiceNav.jsx`; keyword commands scroll, navigate routes, toggle accessibility settings. No backend required for core navigation (browser-only).
-- **`/call`** — **VideoCall:** peer-to-peer video/audio via **PeerJS**; can reuse sign-detection hooks for captions.
-- **`/profiles`** — Accessibility presets (font size, contrast, Priya mode, hover descriptions, colour-blind filters, TTS speed).
+- **`/simplify`** — Cognitive text simplifier → `POST /api/simplify`.
+- **`/image`** — upload or URL → describe API.
+- **`/sign`** — webcam + MediaPipe; optional TF.js model in `public/models/sign_model/`; WebSocket to **Node** for server-side predictions; TTS for feedback.
+- **`/voice`** — Voice Navigator: **Web Speech API** in `useVoiceNav.jsx` (browser-first; optional server transcription via `/api/voice` when wired).
+- **`/call`** — PeerJS video/audio.
+- **`/profiles`** — Accessibility presets (localStorage, etc.).
 
 ### Global accessibility (`AccessibilityContext`)
 
-- Settings persisted in **localStorage** (`accessai_settings_v2`, profiles).
-- **Priya mode** and related flags can drive UI (e.g. keeping sign/camera flows active).
-- **Hover image descriptions:** `GlobalHoverListener` in `App.jsx` — on hover over large `<img>`, calls describe API (blob/data URL vs remote URL) and speaks the result; on failure uses a fixed fallback string.
-
-### Styling / UX
-
-- Tailwind + custom CSS-in-JS blocks per page; **Lucide** icons; optional **OpenDyslexic** font on Simplify when enabled.
+Settings persisted in **localStorage**; hover image descriptions call the describe API when enabled.
 
 ---
 
 ## Browser extension (`extension/`)
 
-- **Manifest V3** — “AccessAI Voice Launcher”: background service worker + content scripts.
-- **Intent:** Voice phrase (e.g. “Open AccessAI”) to open the app; uses `tabs`, `storage`, `activeTab`, broad host permissions for injection.
-- **Separate** from the React app bundle; load unpacked in Chrome/Edge for testing.
+**Manifest V3** — opens the web app URL (see `extension/background.js`). API calls go through the **same-origin** web app and its env-configured base URL.
 
 ---
 
 ## Data & caching
 
-- **PostgreSQL** stores users, **API response cache** (`APICache`) for simplify/describe, and sign logs where implemented.
-- **Hashes** tie cache rows to inputs (text+grade or image bytes).
+- **PostgreSQL:** users, **api_cache** (simplify/describe/voice), **sign_logs** (HTTP sign predict).
+- **Hashes** tie cache rows to inputs.
 
 ---
 
@@ -114,21 +95,21 @@ Uses PostgreSQL via SQLAlchemy; passwords hashed with bcrypt.
 
 | Service | Used for |
 | --- | --- |
-| Hugging Face Inference / Router | Text simplification, image captioning, Whisper transcription |
-| (Optional) CDN | MediaPipe `locateFile` assets for Hands WASM (see `mediapipeHandsClient.js`) |
+| Hugging Face Inference / Router | Text simplification, image captioning, Whisper |
+| (Optional) CDN | MediaPipe `locateFile` for Hands WASM |
 
 ---
 
 ## Typical local run
 
-1. **PostgreSQL** running and matching `DATABASE_URL`.
-2. **`backend/.env`** with `DATABASE_URL`, `HF_API_TOKEN`, model names, `SECRET_KEY`, etc.
-3. **Backend:** `cd backend && source venv/bin/activate && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000`
-4. **Frontend:** `cd frontend && pnpm dev` with `VITE_API_BASE_URL` and `VITE_WS_URL` pointing at the API.
+1. **PostgreSQL** (e.g. `docker compose up -d`) matching `DATABASE_URL` in **`server/.env`**.
+2. **`server/.env`** — `DATABASE_URL`, `HF_*`, `SECRET_KEY`, **`SIGN_SERVICE_URL`** for sign-inference.
+3. **`pnpm dev`** from repo root (see `brain/02-local-dev.md`), or run **`server`** + **`frontend`** + **`services/sign-inference`** separately.
 
 ---
 
 ## Related docs
 
-- Root **`README.md`** — feature overview and setup snippets.
-- **`brain/02-local-dev.md`** — env files and Docker Postgres helper.
+- Root **`README.md`** — overview and setup.
+- **`brain/02-local-dev.md`** — env files and Docker Postgres.
+- **`server/README.md`** — Node API routes and scripts.

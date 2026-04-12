@@ -1,8 +1,12 @@
 # Backend migration: Python → Node
 
-Checklist for moving the AccessAI API from the current **FastAPI** stack in `backend/` to a **Node.js** server while preserving behavior for the React app and extension.
+> **Status (Phase 10):** Migration is **complete**. The FastAPI monolith (`backend/`) has been **removed** from the repo. The live API is **`server/`** (Fastify + Prisma); sign inference remains **`services/sign-inference/`**. This document is kept as a **historical checklist**.
 
-**Context (current backend):** FastAPI app in `backend/main.py` with JWT auth (`backend/auth.py`, `backend/routers/auth.py`), SQLAlchemy + PostgreSQL (`backend/database.py`, `backend/models.py`), routers under `backend/routers/` (simplify, describe, voice, sign), WebSocket `/ws/sign` for live sign inference, and TensorFlow/Keras loading `sign_model.h5` via `backend/ml/sign_model.py`.
+---
+
+Checklist for moving the AccessAI API from the former **FastAPI** stack to a **Node.js** server while preserving behavior for the React app and extension.
+
+**Context (former monolith, removed):** FastAPI app with JWT auth, SQLAlchemy + PostgreSQL, routers (simplify, describe, voice, sign), WebSocket `/ws/sign`, and TensorFlow/Keras for sign — superseded by Node + the sign microservice.
 
 ---
 
@@ -97,9 +101,9 @@ Work router-by-router (files under `backend/routers/`), checking each for extern
 
 ## 9. Decommission Python backend
 
-- [ ] Remove or archive `backend/` Python code only after cutover and rollback plan is clear.
-- [ ] Update `brain/01-project-overview.md` and root `README.md` to describe Node as the API server.
-- [ ] Keep `CHANGELOG.md` (brain) entry for the migration milestone.
+- [x] Remove or archive `backend/` Python code only after cutover and rollback plan is clear.
+- [x] Update `brain/01-project-overview.md` and root `README.md` to describe Node as the API server.
+- [x] Keep `CHANGELOG.md` (brain) entry for the migration milestone.
 
 ---
 

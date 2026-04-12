@@ -35,7 +35,7 @@ export class HfDescribeError extends Error {
   }
 }
 
-/** Same contract as `call_hf_describe` in `backend/routers/describe.py`. */
+/** Same contract as the original FastAPI describe HF helper. */
 export async function callHfDescribe(imageBytes: Buffer, contentType: string): Promise<string> {
   const b64 = imageBytes.toString("base64");
   const imageUrl = `data:${contentType || "image/png"};base64,${b64}`;
