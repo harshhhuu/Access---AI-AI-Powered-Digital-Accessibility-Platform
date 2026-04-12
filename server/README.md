@@ -13,7 +13,7 @@
 ```bash
 cd server
 pnpm install
-# Ensure `server/.env` exists (tracked in repo) or adjust for your machine
+# Copy `server/.env.example` to `server/.env` and fill in secrets
 pnpm exec prisma generate
 pnpm run db:migrate:dev
 ```

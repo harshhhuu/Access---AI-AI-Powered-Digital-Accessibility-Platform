@@ -44,7 +44,7 @@ Generates descriptions of images for visually impaired users.
 ## Installation
 
 ### Frontend
-1. Use `frontend/.env` (tracked) or a local `.env.local` for overrides. Set:
+1. Copy `frontend/.env.example` to `frontend/.env` (or use a local `.env.local` for overrides). Set:
    - `VITE_API_BASE_URL=http://localhost:8001`
    - `VITE_WS_URL=ws://localhost:8001`
 2. Install dependencies with `pnpm install` (or `npm install`)

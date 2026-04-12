@@ -25,7 +25,7 @@ build/
 coverage/
 .nyc_output
 
-# Tracked: `.env`. Ignore local-only overrides.
+# Copy `frontend/.env.example` → `.env` locally. Ignore local-only overrides.
 .env.local
 .env.*.local
 

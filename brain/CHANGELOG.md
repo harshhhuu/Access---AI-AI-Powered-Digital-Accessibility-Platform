@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.23] — 2026-04-12
+
+- **Git history:** Removed `server/.env`, `frontend/.env`, and historical `backend/.env` from all commits (`git filter-repo --invert-paths`). Restored **`server/.env.example`** and **`frontend/.env.example`** (keys only); real `.env` files are gitignored. Documented in `brain/02-local-dev.md`. After pulling, run `git fetch` and reset to the rewritten branch, or re-clone.
+
 ## [brain-0.1.21] — 2026-04-12
 
 - Sign Call remote video: mount in-call UI as soon as the outgoing user dials; split **remote audio** into a hidden `<audio>` and **mute** the remote `<video>` so autoplay is not blocked; add **TURN** (OpenRelay) + STUN ICE servers; **`track`** fallback on `RTCPeerConnection`; dial timeout uses **remoteStreamReceived**; incoming call **answer** after `setCallActive` so the remote video node exists (`VideoCall.jsx`).

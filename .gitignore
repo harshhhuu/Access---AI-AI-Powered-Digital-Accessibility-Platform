@@ -1,5 +1,9 @@
 node_modules/
 
+# Secrets — never commit; copy from `server/.env.example` / `frontend/.env.example`
+server/.env
+frontend/.env
+
 **/.env.local
 
 services/sign-inference/.venv/

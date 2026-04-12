@@ -263,7 +263,7 @@ Pick **one** pattern (document in README):
 
 - [x] **Compose or K8s:** Node + Python sign + Postgres; internal network only for Python.
 - [x] **Env:** `SIGN_SERVICE_URL` in Node; never commit secrets. *(Compose sets `http://sign:9001`; document-only for production secrets.)*
-- [x] **Frontend:** `VITE_API_BASE_URL` and `VITE_WS_URL` point to Node host (same origin as today, new port if needed). *(Defaults in code + tracked `frontend/.env`.)*
+- [x] **Frontend:** `VITE_API_BASE_URL` and `VITE_WS_URL` point to Node host (same origin as today, new port if needed). *(Defaults in code + `frontend/.env` from `frontend/.env.example`.)*
 - [x] **Extension:** Update any hardcoded API URLs if present. *(Chrome extension only opens the Vite URL; no API host change.)*
 - [x] **Blue/green or canary:** Run Node behind new hostname first; switch when stable. *(Documented in `deploy/README.md`.)*
 - [x] **Rollback plan:** Revert DNS/env to old FastAPI monolith until fixed. *(Documented in `deploy/README.md`.)*

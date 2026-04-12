@@ -1,6 +1,13 @@
 # Local development
 
-## Environment files (tracked in repo)
+## Environment files (not committed)
+
+Templates live in **`server/.env.example`** and **`frontend/.env.example`**. Copy them locally and fill in values:
+
+```bash
+cp server/.env.example server/.env
+cp frontend/.env.example frontend/.env
+```
 
 | Location | Purpose |
 | --- | --- |
