@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.7] — 2026-04-12
+
+- Phase 2 Node shell: added `server/` (Fastify, Prisma, `GET /health`, CORS, initial SQL migration `20260412120000_init`). Updated `02-local-dev.md`, `01-project-overview.md`, `05-node-migration-phased-plan.md`, and index link to `server/README.md`.
+
 ## [brain-0.1.6] — 2026-04-12
 
 - Stop ignoring `frontend/.env` in root and `frontend/.gitignore` so default Vite API/WebSocket URLs can be versioned (same values as `.env.example`; `backend/.env` and `.env.local` remain ignored).

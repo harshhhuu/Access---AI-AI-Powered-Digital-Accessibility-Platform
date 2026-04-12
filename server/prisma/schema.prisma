@@ -1,0 +1,44 @@
+// PostgreSQL schema aligned with backend/models.py (SQLAlchemy) for migration parity.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique @db.VarChar(255)
+  hashedPassword   String    @map("hashed_password") @db.VarChar(255)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  preferences      Json      @default("{}") @db.JsonB
+  signLogs         SignLog[]
+
+  @@map("users")
+}
+
+model APICache {
+  id          Int      @id @default(autoincrement())
+  inputHash   String   @unique @map("input_hash") @db.VarChar(64)
+  endpoint    String   @db.VarChar(50)
+  gradeLevel  Int?     @map("grade_level")
+  outputText  String   @map("output_text") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("api_cache")
+}
+
+model SignLog {
+  id            Int      @id @default(autoincrement())
+  userId        Int?     @map("user_id")
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  detectedSign  String?  @map("detected_sign") @db.VarChar(100)
+  confidence    Float?   @map("confidence")
+  landmarkJson  Json?    @map("landmark_json") @db.JsonB
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("sign_logs")
+}

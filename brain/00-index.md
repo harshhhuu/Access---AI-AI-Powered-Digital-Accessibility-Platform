@@ -10,6 +10,7 @@ Small, focused notes for the AccessAI repo. Add new topics as `NN-short-name.md`
 | [03-backend-python-to-node-migration](03-backend-python-to-node-migration.md) | Checklist: migrating API from Python/FastAPI to Node |
 | [04-features-and-stack](04-features-and-stack.md) | Features and technology stack (end-to-end) |
 | [05-node-migration-phased-plan](05-node-migration-phased-plan.md) | Phased implementation plan: Node API + Python sign service |
+| [server/README.md](../server/README.md) | Node Fastify + Prisma API (migration shell) |
 
 ## Conventions
 

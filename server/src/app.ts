@@ -1,0 +1,36 @@
+import cors from "@fastify/cors";
+import Fastify, { type FastifyInstance } from "fastify";
+import { prisma } from "./lib/prisma.js";
+
+function parseOrigins(): string[] {
+  const frontend = process.env.FRONTEND_URL ?? "https://your-vercel-app.vercel.app";
+  return ["http://localhost:5173", "http://localhost:3000", frontend];
+}
+
+export async function buildApp(): Promise<FastifyInstance> {
+  const app = Fastify({
+    logger: true,
+  });
+
+  await app.register(cors, {
+    origin: parseOrigins(),
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: "*",
+  });
+
+  app.get("/health", async () => ({
+    status: "ok",
+    message: "AccessAI API is running",
+  }));
+
+  app.addHook("onReady", async () => {
+    await prisma.$queryRaw`SELECT 1`;
+  });
+
+  app.addHook("onClose", async () => {
+    await prisma.$disconnect();
+  });
+
+  return app;
+}

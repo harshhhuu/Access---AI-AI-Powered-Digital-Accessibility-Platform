@@ -6,6 +6,7 @@
 | --- | --- |
 | `backend/.env` | `DATABASE_URL`, Hugging Face models/tokens, JWT `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
 | `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` (default: `http://localhost:8000` and `ws://localhost:8000`) |
+| `server/.env` | `DATABASE_URL`, `FRONTEND_URL`, optional `PORT` / `HOST` — copy from `server/.env.example` |
 
 Copy from `frontend/.env.example` if you need a template; backend follows `backend/README.md`.
 
@@ -24,6 +25,22 @@ cd frontend && pnpm install && pnpm dev
 ```
 
 PostgreSQL must match `DATABASE_URL` (host, port, database name, credentials). Tables are created on API startup.
+
+## Node API (Phase 2 migration)
+
+The Fastify + Prisma app in `server/` is the future main API. During migration it only exposes `GET /health` and connects to the same PostgreSQL schema as the Python backend.
+
+```bash
+cd server
+pnpm install
+cp .env.example .env
+pnpm exec prisma generate
+# Empty DB: pnpm run db:migrate:dev
+# DB already used by Python: see `server/README.md` (baseline `migrate resolve`)
+pnpm dev
+```
+
+Use `PORT=8001` in `server/.env` if you still run the Python app on 8000. Point the frontend at `http://localhost:8001` only to test `/health` until feature routes are ported.
 
 ## Sign inference service (Phase 1 migration)
 

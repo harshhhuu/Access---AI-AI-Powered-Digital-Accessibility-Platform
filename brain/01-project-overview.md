@@ -6,7 +6,8 @@
 
 | Path | Role |
 | --- | --- |
-| `backend/` | FastAPI + PostgreSQL API and services |
+| `backend/` | FastAPI + PostgreSQL API and services (being migrated) |
+| `server/` | Node.js FastAPI successor — Fastify + Prisma (see migration plan) |
 | `frontend/` | React web app |
 | `extension/` | Browser extension |
 | `docs/` | Images and supplementary docs |
@@ -14,7 +15,7 @@
 
 ## Tech stack (high level)
 
-- **Backend:** Python 3.11, FastAPI, PostgreSQL
+- **Backend:** Python 3.11, FastAPI, PostgreSQL (legacy monolith); **Node** (Fastify + Prisma) in `server/` for the migration
 - **Frontend:** React (see `frontend/package.json` for versions)
 - **AI / media:** CV, speech, and NLP pipelines as described in the root `README.md`
 

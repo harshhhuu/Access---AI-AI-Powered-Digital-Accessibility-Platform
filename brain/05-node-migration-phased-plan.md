@@ -120,17 +120,19 @@ flowchart TB
 
 ## Phase 2 — Node application shell + database
 
+**Status:** Implemented in `server/` — **Fastify** + **Prisma** + **TypeScript**, `GET /health`, CORS aligned with `backend/main.py`, initial migration `20260412120000_init`. See `server/README.md` and `brain/02-local-dev.md`.
+
 **Goal:** Node boots, connects to Postgres, **no** feature routes yet except health.
 
 **Tasks:**
 
-- [ ] Create Node project (TypeScript recommended), lint/format aligned with repo.
-- [ ] Implement `GET /health` with same JSON shape as Python (`{ "status": "ok", "message": "..." }` or match exactly).
-- [ ] Wire **CORS** to match `backend/main.py`: `localhost:5173`, `localhost:3000`, `FRONTEND_URL`, credentials, methods/headers `*`.
-- [ ] Replace `create_all` with **explicit migrations** that recreate existing tables (no data loss if migrating empty dev DB; for prod, migrations should be additive-only if schema unchanged).
-- [ ] Shared DB module: connection pool, transaction handling.
+- [x] Create Node project (TypeScript recommended), lint/format aligned with repo.
+- [x] Implement `GET /health` with same JSON shape as Python (`{ "status": "ok", "message": "..." }` or match exactly).
+- [x] Wire **CORS** to match `backend/main.py`: `localhost:5173`, `localhost:3000`, `FRONTEND_URL`, credentials, methods/headers `*`.
+- [x] Replace `create_all` with **explicit migrations** that recreate existing tables (no data loss if migrating empty dev DB; for prod, migrations should be additive-only if schema unchanged).
+- [x] Shared DB module: connection pool, transaction handling.
 
-**Exit criteria:** Frontend can point to Node for `/health` only; DB tables exist; no auth yet.
+**Exit criteria:** Frontend can point to Node for `/health` only; DB tables exist; no auth yet. **Verified:** `pnpm run build`, `GET /health` returns expected JSON with DB up; existing Postgres from Python baseline-marked via `prisma migrate resolve --applied 20260412120000_init`.
 
 ---
 
