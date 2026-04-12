@@ -59,7 +59,7 @@ export const COMMANDS = [
     },
   },
   {
-    keywords: ["go back", "go backward", "previous page", "back"],
+    keywords: ["go back", "go backward", "previous page"],
     description: "Go to previous page",
     category: "navigation",
     action: (navigate) => {
@@ -178,7 +178,21 @@ export const COMMANDS = [
     },
   },
   {
-    keywords: ["read page", "read this", "read aloud", "speak page", "read everything"],
+    keywords: [
+      "read me the page",
+      "read the page",
+      "read this page",
+      "speak the page",
+      "speak this page",
+      "read everything",
+      "read aloud",
+      "read page",
+      "speak page",
+      "read this",
+      "start reading",
+      "narrate page",
+      "speak it",
+    ],
     description: "Read page content aloud",
     category: "reading",
     action: (_, ctx) => {
@@ -208,6 +222,19 @@ export const COMMANDS = [
   },
 ];
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Prefer longer keyword matches; single-word keywords use word boundaries to reduce false positives. */
+function matchesKeyword(lower, keyword) {
+  const key = keyword.toLowerCase();
+  if (key.includes(" ")) {
+    return lower.includes(key);
+  }
+  return new RegExp(`\\b${escapeRegExp(key)}\\b`, "i").test(lower);
+}
+
 function useVoiceNavController() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -228,14 +255,17 @@ function useVoiceNavController() {
 
   const matchCommand = useCallback((text) => {
     const lower = text.toLowerCase().trim();
+    let best = null;
+    let bestLen = -1;
     for (const command of COMMANDS) {
       for (const keyword of command.keywords) {
-        if (lower.includes(keyword)) {
-          return command;
+        if (matchesKeyword(lower, keyword) && keyword.length > bestLen) {
+          best = command;
+          bestLen = keyword.length;
         }
       }
     }
-    return null;
+    return best;
   }, []);
 
   const stopListening = useCallback(() => {

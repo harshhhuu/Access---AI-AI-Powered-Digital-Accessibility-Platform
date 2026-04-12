@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.19] — 2026-04-12
+
+- Frontend TTS: `frontend/src/lib/browserTts.js` — `speechSynthesis.resume()`, Safari `voiceschanged`, and `getVoices()` priming so Read Aloud / voice “read page” work across WebKit and Chrome. `AccessibilityContext.speak` and sign `speakText` use it. Voice nav: natural phrases (`read the page`, …), longest-keyword match, word-boundary single tokens, removed bare `back` keyword to avoid false matches.
+
 ## [brain-0.1.18] — 2026-04-12
 
 - Phase 10 decommission: removed the FastAPI **`backend/`** monolith; **`services/sign-inference/`** is the only Python service. Updated **`brain/01-project-overview.md`**, **`brain/02-local-dev.md`**, **`brain/04-features-and-stack.md`**, **`brain/03-backend-python-to-node-migration.md`**, **`brain/05-node-migration-phased-plan.md`**, root **`README.md`**, **`frontend/README.md`**, **`deploy/README.md`**, **`server/README.md`**, **`server/.env`** header; server comments no longer reference removed paths.

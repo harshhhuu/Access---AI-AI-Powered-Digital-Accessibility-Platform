@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as tf from "@tensorflow/tfjs";
 import { ensureMediapipeHands } from "../lib/mediapipeHandsClient";
+import { speakBrowserTts } from "../lib/browserTts";
 import { WS_SIGN_URL } from "../api/api";
 
 // Alphabetical order to match the trained model / sklearn LabelEncoder output.
@@ -19,12 +20,7 @@ function extractLandmarks(hand) {
 }
 
 function speakText(text) {
-  if (!text || !window.speechSynthesis) {
-    return;
-  }
-
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+  speakBrowserTts(text, { rate: 1 });
 }
 
 export function useSignDetection(webcamRef, canvasRef, isActive) {

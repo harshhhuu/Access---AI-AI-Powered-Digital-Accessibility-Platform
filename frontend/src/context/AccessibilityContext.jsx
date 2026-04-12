@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { speakBrowserTts } from "../lib/browserTts";
 
 const AccessibilityContext = createContext(null);
 
@@ -232,13 +233,12 @@ export function AccessibilityProvider({ children }) {
     resetAccessibilitySettings();
   };
 
-  const speak = (text) => {
-    if (!window.speechSynthesis || !text) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = ttsSpeed;
-    window.speechSynthesis.speak(utterance);
-  };
+  const speak = useCallback(
+    (text) => {
+      speakBrowserTts(text, { rate: ttsSpeed });
+    },
+    [ttsSpeed]
+  );
 
   const value = {
     fontSize,
