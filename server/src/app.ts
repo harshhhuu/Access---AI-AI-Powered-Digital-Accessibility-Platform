@@ -1,9 +1,11 @@
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
+import websocket from "@fastify/websocket";
 import Fastify, { type FastifyInstance } from "fastify";
 import { prisma } from "./lib/prisma.js";
 import { authRoutes } from "./routes/auth.js";
 import { describeRoutes } from "./routes/describe.js";
+import { signRoutes } from "./routes/sign.js";
 import { simplifyRoutes } from "./routes/simplify.js";
 import { voiceRoutes } from "./routes/voice.js";
 
@@ -33,6 +35,8 @@ export async function buildApp(): Promise<FastifyInstance> {
     limits: { fileSize: 25 * 1024 * 1024 },
   });
 
+  await app.register(websocket);
+
   app.get("/health", async () => ({
     status: "ok",
     message: "AccessAI API is running",
@@ -42,6 +46,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(simplifyRoutes, { prefix: "/api" });
   await app.register(describeRoutes, { prefix: "/api" });
   await app.register(voiceRoutes, { prefix: "/api" });
+  await app.register(signRoutes);
 
   app.addHook("onReady", async () => {
     await prisma.$queryRaw`SELECT 1`;

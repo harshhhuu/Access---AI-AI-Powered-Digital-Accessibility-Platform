@@ -211,15 +211,17 @@ flowchart TB
 
 ## Phase 7 — Sign: HTTP + WebSocket via Python service
 
+**Status:** Implemented in `server/src/routes/sign.ts`, `server/src/lib/sign-service-client.ts`; **`@fastify/websocket`** for **`GET /ws/sign`**. HTTP **`POST /api/sign/predict`** forwards to **`SIGN_SERVICE_URL/predict`** (no prefix on the env URL). **`SignLog`** rows on HTTP success only (matches `backend/routers/sign.py`); WebSocket path does **not** log (matches `backend/main.py`).
+
 **Goal:** Public API **on Node**; inference **on Python**.
 
 ### 7a — `POST /api/sign/predict`
 
-- [ ] Validate 63 landmarks.
-- [ ] `POST` to `SIGN_SERVICE_URL/predict` with `{ landmarks }`.
-- [ ] On success, insert `SignLog` (same columns as `sign.py`).
-- [ ] Map Python service errors to same HTTP status codes as today (400 vs 503).
-- [ ] Return `SignPredictResponse`.
+- [x] Validate 63 landmarks.
+- [x] `POST` to `SIGN_SERVICE_URL/predict` with `{ landmarks }`.
+- [x] On success, insert `SignLog` (same columns as `sign.py`).
+- [x] Map Python service errors to same HTTP status codes as today (400 vs 503).
+- [x] Return `SignPredictResponse`.
 
 ### 7b — `WebSocket /ws/sign`
 
@@ -230,10 +232,10 @@ Pick **one** pattern (document in README):
 
 **Tasks:**
 
-- [ ] Same message validation: 63 floats; error JSON shape `{ "error": "..." }` as in `main.py`.
-- [ ] No DB logging on WS unless you change product intent (current Python WS does not log).
+- [x] Same message validation: 63 floats; error JSON shape `{ "error": "..." }` as in `main.py`.
+- [x] No DB logging on WS unless you change product intent (current Python WS does not log).
 
-**Exit criteria:** Frontend sign page works against Node only; WebSocket and HTTP predict match Python service outputs.
+**Exit criteria:** Frontend sign page works against Node only; WebSocket and HTTP predict match Python service outputs. **Verified:** `pnpm run build`; set `SIGN_SERVICE_URL` and run sign-inference on **9001**; `VITE_WS_URL=ws://localhost:8001` when Node serves WS.
 
 ---
 

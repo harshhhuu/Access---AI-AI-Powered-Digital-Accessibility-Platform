@@ -6,7 +6,7 @@
 | --- | --- |
 | `backend/.env` | `DATABASE_URL`, Hugging Face models/tokens, JWT `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
 | `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` |
-| `server/.env` | `DATABASE_URL`, JWT, `FRONTEND_URL`, `HF_*`, optional `PORT` / `HOST` — align JWT with `backend/.env` when testing both APIs |
+| `server/.env` | `DATABASE_URL`, JWT, `FRONTEND_URL`, `HF_*`, **`SIGN_SERVICE_URL`** (Python sign-inference, e.g. `http://127.0.0.1:9001`), optional `PORT` / `HOST` — align JWT with `backend/.env` when testing both APIs |
 
 Use local-only overrides in `.env.local` (gitignored). Backend details: `backend/README.md`.
 
@@ -39,7 +39,7 @@ pnpm exec prisma generate
 pnpm dev
 ```
 
-Use `PORT=8001` in `server/.env` if you still run the Python app on 8000. Point the frontend at `http://localhost:8001` only to test `/health` until feature routes are ported.
+Use `PORT=8001` in `server/.env` if you still run the Python app on 8000. Point the frontend at `http://localhost:8001` and **`VITE_WS_URL=ws://localhost:8001`** when testing the **Node** API end-to-end (including **`/ws/sign`**, which Node proxies to `SIGN_SERVICE_URL`). If you still use FastAPI on 8000 for WebSocket sign only, you can keep `VITE_WS_URL=ws://localhost:8000` until cutover.
 
 ## Sign inference service (Phase 1 migration)
 

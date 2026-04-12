@@ -61,7 +61,7 @@ export const registerUser = ({ email, password }) =>
 
 // ===========================================================================
 // SIGN LANGUAGE  (WebSocket — not axios, handled in useSignDetection hook)
-// WS URL: ws://localhost:8000/ws/sign
+// WS URL: e.g. ws://localhost:8001/ws/sign when using Node API (VITE_WS_URL)
 // Message sent: JSON.stringify({ landmarks: Float32Array(63) })
 // Message received: { sign: string, confidence: number }
 // ===========================================================================
