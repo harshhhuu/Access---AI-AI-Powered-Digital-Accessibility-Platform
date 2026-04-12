@@ -55,11 +55,39 @@ function buildCaption(sign, confidence, side) {
   };
 }
 
+/** STUN + public TURN so peers can connect across NATs (STUN-only often fails). */
+const PEER_ICE_SERVERS = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" },
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+];
+
 export default function VideoCall() {
   const localVideoRef = useRef(null);
   const signVideoRef = useRef({ video: null });
   const canvasRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
+  /** Remote MediaStream if it arrives before the in-call remote video node mounts (outgoing caller). */
+  const pendingRemoteStreamRef = useRef(null);
+  /** True once PeerJS/`track` delivered a remote MediaStream (clears outgoing dial timeout). */
+  const remoteStreamReceivedRef = useRef(false);
+  /** True once the remote video element has srcObject (dedupe stream + track events). */
+  const remoteDomAttachedRef = useRef(false);
   const peerRef = useRef(null);
   const callRef = useRef(null);
   const connRef = useRef(null);
@@ -97,13 +125,51 @@ export default function VideoCall() {
   } = useSignDetection(signVideoRef, canvasRef, callActive && camOn);
 
   const attachRemoteStream = useCallback((stream) => {
-    if (!remoteVideoRef.current) {
+    if (!stream?.getTracks?.().length || remoteDomAttachedRef.current) {
       return;
     }
 
-    remoteVideoRef.current.srcObject = stream;
-    setHasRemoteStream(true);
-    remoteVideoRef.current.play().catch(() => {});
+    pendingRemoteStreamRef.current = stream;
+
+    const videoEl = remoteVideoRef.current;
+    const audioEl = remoteAudioRef.current;
+
+    if (videoEl) {
+      remoteDomAttachedRef.current = true;
+      videoEl.srcObject = stream;
+      pendingRemoteStreamRef.current = null;
+      setHasRemoteStream(true);
+      videoEl.play().catch(() => {});
+    }
+
+    if (audioEl) {
+      audioEl.srcObject = stream;
+      audioEl.play().catch(() => {});
+    }
+  }, []);
+
+  const setRemoteVideoElement = useCallback((node) => {
+    remoteVideoRef.current = node;
+    if (node && pendingRemoteStreamRef.current) {
+      const pending = pendingRemoteStreamRef.current;
+      pendingRemoteStreamRef.current = null;
+      remoteDomAttachedRef.current = true;
+      node.srcObject = pending;
+      setHasRemoteStream(true);
+      node.play().catch(() => {});
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = pending;
+        remoteAudioRef.current.play().catch(() => {});
+      }
+    }
+  }, []);
+
+  const setRemoteAudioElement = useCallback((node) => {
+    remoteAudioRef.current = node;
+    if (node && pendingRemoteStreamRef.current) {
+      node.srcObject = pendingRemoteStreamRef.current;
+      node.play().catch(() => {});
+    }
   }, []);
 
   const stopLocalStream = useCallback(() => {
@@ -187,8 +253,14 @@ export default function VideoCall() {
     timeoutRef.current = null;
     remoteTypingTimerRef.current = null;
 
+    pendingRemoteStreamRef.current = null;
+    remoteStreamReceivedRef.current = false;
+    remoteDomAttachedRef.current = false;
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
+    }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
     }
 
     setHasRemoteStream(false);
@@ -254,7 +326,19 @@ export default function VideoCall() {
       callRef.current = call;
       setRemoteId(nextRemoteId);
 
+      const tryAttachFromTrack = (ev) => {
+        if (remoteStreamReceivedRef.current || remoteDomAttachedRef.current) {
+          return;
+        }
+        const stream = ev.streams?.[0] ?? (ev.track ? new MediaStream([ev.track]) : null);
+        if (stream?.getTracks?.().length) {
+          remoteStreamReceivedRef.current = true;
+          attachRemoteStream(stream);
+        }
+      };
+
       call.on("stream", (remoteStream) => {
+        remoteStreamReceivedRef.current = true;
         attachRemoteStream(remoteStream);
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -264,11 +348,15 @@ export default function VideoCall() {
         setCallActive(true);
       });
 
+      call.peerConnection?.addEventListener("track", tryAttachFromTrack);
+
       call.on("close", () => {
+        call.peerConnection?.removeEventListener("track", tryAttachFromTrack);
         hangUp(false);
       });
 
       call.on("error", () => {
+        call.peerConnection?.removeEventListener("track", tryAttachFromTrack);
         setErrorMessage("Call failed. Check the call ID and try again.");
         hangUp(false);
       });
@@ -295,10 +383,7 @@ export default function VideoCall() {
       path: "/",
       secure: true,
       config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:stun1.l.google.com:19302" },
-        ],
+        iceServers: PEER_ICE_SERVERS,
       },
     });
 
@@ -321,13 +406,20 @@ export default function VideoCall() {
 
     peer.on("call", async (incomingCall) => {
       try {
+        remoteStreamReceivedRef.current = false;
+        remoteDomAttachedRef.current = false;
+        pendingRemoteStreamRef.current = null;
+
         const stream = await getLocalStream();
         bindCall(incomingCall, incomingCall.peer);
-        incomingCall.answer(stream);
+
         callActiveRef.current = true;
         setCallActive(true);
         setPeerStatus("connected");
         setErrorMessage("");
+
+        incomingCall.answer(stream);
+
         speakText("Incoming call connected. Start signing to send captions.");
       } catch {
         setErrorMessage("Camera or microphone access was denied.");
@@ -422,13 +514,21 @@ export default function VideoCall() {
       const connection = peerRef.current.connect(nextRemoteId, { reliable: true });
       bindConnection(connection);
 
+      remoteStreamReceivedRef.current = false;
+      remoteDomAttachedRef.current = false;
+      pendingRemoteStreamRef.current = null;
+
       const call = peerRef.current.call(nextRemoteId, stream);
       bindCall(call, nextRemoteId);
 
+      callActiveRef.current = true;
+      setCallActive(true);
+      setPeerStatus("calling");
+
       timeoutRef.current = setTimeout(() => {
-        if (!callActiveRef.current) {
+        if (!remoteStreamReceivedRef.current) {
           hangUp(false);
-          setErrorMessage("No answer. Make sure the other person has this page open.");
+          setErrorMessage("No answer or media failed. Check IDs, both on /call, firewall/NAT, and try again.");
         }
       }, 20000);
     } catch {
@@ -784,7 +884,14 @@ export default function VideoCall() {
                       background: "#020617",
                     }}
                   >
-                    <video ref={remoteVideoRef} autoPlay playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <video
+                      ref={setRemoteVideoElement}
+                      autoPlay
+                      playsInline
+                      muted
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                    <audio ref={setRemoteAudioElement} autoPlay playsInline aria-hidden style={{ position: "absolute", width: 0, height: 0, opacity: 0, pointerEvents: "none" }} />
                     {!hasRemoteStream ? (
                       <div
                         style={{

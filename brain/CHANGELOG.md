@@ -2,6 +2,14 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.21] — 2026-04-12
+
+- Sign Call remote video: mount in-call UI as soon as the outgoing user dials; split **remote audio** into a hidden `<audio>` and **mute** the remote `<video>` so autoplay is not blocked; add **TURN** (OpenRelay) + STUN ICE servers; **`track`** fallback on `RTCPeerConnection`; dial timeout uses **remoteStreamReceived**; incoming call **answer** after `setCallActive` so the remote video node exists (`VideoCall.jsx`).
+
+## [brain-0.1.20] — 2026-04-12
+
+- Sign Call: fixed missing **remote video** for the **outgoing caller** — the remote `MediaStream` could arrive before the in-call `<video>` mounted, so `attachRemoteStream` bailed with a null ref; pending stream + callback ref on the remote video (`VideoCall.jsx`).
+
 ## [brain-0.1.19] — 2026-04-12
 
 - Frontend TTS: `frontend/src/lib/browserTts.js` — `speechSynthesis.resume()`, Safari `voiceschanged`, and `getVoices()` priming so Read Aloud / voice “read page” work across WebKit and Chrome. `AccessibilityContext.speak` and sign `speakText` use it. Voice nav: natural phrases (`read the page`, …), longest-keyword match, word-boundary single tokens, removed bare `back` keyword to avoid false matches.
