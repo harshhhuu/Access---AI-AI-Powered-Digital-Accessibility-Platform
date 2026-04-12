@@ -138,18 +138,20 @@ flowchart TB
 
 ## Phase 3 — Authentication and user preferences
 
+**Status:** Implemented in `server/src/routes/auth.ts` with `bcrypt` (12 rounds), `jsonwebtoken` (HS256, `sub` = string user id), Zod validation. Same `SECRET_KEY` / `ALGORITHM` / `ACCESS_TOKEN_EXPIRE_MINUTES` as `backend/.env` for token parity.
+
 **Goal:** Register, login, `me`, `preferences` — **byte-compatible** with current clients.
 
 **Tasks:**
 
-- [ ] **bcrypt:** Use same cost factor as Python (check `passlib`/`bcrypt` defaults in Python — typically `bcrypt` default rounds; ensure Node’s `bcrypt` or `@node-rs/bcrypt` produces verifiable hashes for existing users).
-- [ ] **JWT:** Same `SECRET_KEY`, `ALGORITHM` (HS256), `sub` = user id as string/int consistent with `auth.py` (`int(user_id)` in payload — verify `create_access_token` and `jwt.decode` expectations).
-- [ ] `POST /auth/register` — create row in `users`; return `TokenResponse`.
-- [ ] `POST /auth/login` — verify password; return token.
-- [ ] `GET /auth/me` — Bearer required; return `UserResponse` including `preferences` JSON.
-- [ ] `PUT /auth/preferences` — **replaces** the entire `preferences` JSON object (see `backend/routers/auth.py`: assign `body.preferences`, not deep-merge).
+- [x] **bcrypt:** Use same cost factor as Python (check `passlib`/`bcrypt` defaults in Python — typically `bcrypt` default rounds; ensure Node’s `bcrypt` or `@node-rs/bcrypt` produces verifiable hashes for existing users).
+- [x] **JWT:** Same `SECRET_KEY`, `ALGORITHM` (HS256), `sub` = user id as string/int consistent with `auth.py` (`int(user_id)` in payload — verify `create_access_token` and `jwt.decode` expectations).
+- [x] `POST /auth/register` — create row in `users`; return `TokenResponse`.
+- [x] `POST /auth/login` — verify password; return token.
+- [x] `GET /auth/me` — Bearer required; return `UserResponse` including `preferences` JSON.
+- [x] `PUT /auth/preferences` — **replaces** the entire `preferences` JSON object (see `backend/routers/auth.py`: assign `body.preferences`, not deep-merge).
 
-**Exit criteria:** Manual or automated test: register → login → me → preferences; existing DB user from Python can log in from Node (if hash compatible).
+**Exit criteria:** Manual or automated test: register → login → me → preferences; existing DB user from Python can log in from Node (if hash compatible). **Verified:** curl flow on port 8020; wrong password → `401` + `Incorrect email or password`; duplicate email → `400`.
 
 ---
 

@@ -1,6 +1,6 @@
-# AccessAI Node API (migration Phase 2)
+# AccessAI Node API (migration)
 
-Minimal **Fastify** + **Prisma** shell: `GET /health`, PostgreSQL connection, CORS aligned with `backend/main.py`. Feature routes (auth, simplify, …) come in later phases.
+**Fastify** + **Prisma** + **TypeScript**. Phase 2 added `GET /health` and DB; **Phase 3** added **`/auth/*`** (register, login, me, preferences) compatible with `backend/auth.py` and `backend/routers/auth.py` (JWT HS256, bcrypt, same JSON shapes).
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Minimal **Fastify** + **Prisma** shell: `GET /health`, PostgreSQL connection, CO
 cd server
 pnpm install
 cp .env.example .env
-# Edit .env — set DATABASE_URL if different from the example
+# Edit .env — DATABASE_URL, SECRET_KEY (must match backend/.env during migration for token parity), FRONTEND_URL
 pnpm exec prisma generate
 pnpm run db:migrate:dev
 ```
@@ -33,8 +33,20 @@ pnpm dev
 ```
 
 - Health: `GET http://localhost:8000/health` → `{"status":"ok","message":"AccessAI API is running"}`
+- Auth: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `PUT /auth/preferences` (Bearer token)
 
-To try alongside the Python backend, set `PORT=8001` in `.env` and point the frontend at `http://localhost:8001` only for `/health` tests.
+Use `PORT=8001` in `.env` if the Python backend still uses 8000.
+
+## Environment
+
+| Variable | Role |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SECRET_KEY` | JWT signing secret (same as `backend` for interchangeable tokens) |
+| `ALGORITHM` | Default `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Default `1440` |
+| `FRONTEND_URL` | CORS allowlist |
+| `PORT` / `HOST` | Listen address (default `8000` / `0.0.0.0`) |
 
 ## Scripts
 

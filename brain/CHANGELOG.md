@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.8] — 2026-04-12
+
+- Phase 3 auth on Node: `POST/GET/PUT /auth/*` in `server/` (bcrypt, JWT HS256, FastAPI-shaped `detail` errors). Updated `server/README.md`, `server/.env.example`, `05-node-migration-phased-plan.md`.
+
 ## [brain-0.1.7] — 2026-04-12
 
 - Phase 2 Node shell: added `server/` (Fastify, Prisma, `GET /health`, CORS, initial SQL migration `20260412120000_init`). Updated `02-local-dev.md`, `01-project-overview.md`, `05-node-migration-phased-plan.md`, and index link to `server/README.md`.

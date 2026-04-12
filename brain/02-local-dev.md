@@ -6,7 +6,7 @@
 | --- | --- |
 | `backend/.env` | `DATABASE_URL`, Hugging Face models/tokens, JWT `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
 | `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` (default: `http://localhost:8000` and `ws://localhost:8000`) |
-| `server/.env` | `DATABASE_URL`, `FRONTEND_URL`, optional `PORT` / `HOST` — copy from `server/.env.example` |
+| `server/.env` | `DATABASE_URL`, `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `FRONTEND_URL`, optional `PORT` / `HOST` — copy from `server/.env.example` (JWT vars should match `backend/.env` when testing both APIs) |
 
 Copy from `frontend/.env.example` if you need a template; backend follows `backend/README.md`.
 
@@ -28,7 +28,7 @@ PostgreSQL must match `DATABASE_URL` (host, port, database name, credentials). T
 
 ## Node API (Phase 2 migration)
 
-The Fastify + Prisma app in `server/` is the future main API. During migration it only exposes `GET /health` and connects to the same PostgreSQL schema as the Python backend.
+The Fastify + Prisma app in `server/` is the future main API. It exposes `GET /health`, **`/auth/*`** (register, login, me, preferences), and connects to the same PostgreSQL schema as the Python backend.
 
 ```bash
 cd server

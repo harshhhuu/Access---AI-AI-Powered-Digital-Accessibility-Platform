@@ -1,6 +1,7 @@
 import cors from "@fastify/cors";
 import Fastify, { type FastifyInstance } from "fastify";
 import { prisma } from "./lib/prisma.js";
+import { authRoutes } from "./routes/auth.js";
 
 function parseOrigins(): string[] {
   const frontend = process.env.FRONTEND_URL ?? "https://your-vercel-app.vercel.app";
@@ -23,6 +24,8 @@ export async function buildApp(): Promise<FastifyInstance> {
     status: "ok",
     message: "AccessAI API is running",
   }));
+
+  await app.register(authRoutes, { prefix: "/auth" });
 
   app.addHook("onReady", async () => {
     await prisma.$queryRaw`SELECT 1`;
