@@ -1,14 +1,14 @@
 # Local development
 
-## Environment files (not committed)
+## Environment files (tracked in repo)
 
 | Location | Purpose |
 | --- | --- |
 | `backend/.env` | `DATABASE_URL`, Hugging Face models/tokens, JWT `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` |
-| `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` (default: `http://localhost:8000` and `ws://localhost:8000`) |
-| `server/.env` | `DATABASE_URL`, `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `FRONTEND_URL`, optional `PORT` / `HOST` — copy from `server/.env.example` (JWT vars should match `backend/.env` when testing both APIs) |
+| `frontend/.env` | `VITE_API_BASE_URL`, `VITE_WS_URL` |
+| `server/.env` | `DATABASE_URL`, JWT, `FRONTEND_URL`, `HF_*`, optional `PORT` / `HOST` — align JWT with `backend/.env` when testing both APIs |
 
-Copy from `frontend/.env.example` if you need a template; backend follows `backend/README.md`.
+Use local-only overrides in `.env.local` (gitignored). Backend details: `backend/README.md`.
 
 ## Run commands
 
@@ -33,7 +33,6 @@ The Fastify + Prisma app in `server/` is the future main API. It exposes `GET /h
 ```bash
 cd server
 pnpm install
-cp .env.example .env
 pnpm exec prisma generate
 # Empty DB: pnpm run db:migrate:dev
 # DB already used by Python: see `server/README.md` (baseline `migrate resolve`)

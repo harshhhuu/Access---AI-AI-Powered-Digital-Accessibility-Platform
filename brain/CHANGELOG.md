@@ -2,6 +2,10 @@
 
 Versioned record of knowledge-base and process changes. Newest first.
 
+## [brain-0.1.11] — 2026-04-12
+
+- Removed `frontend/.env.example`, `server/.env.example`, and `services/sign-inference/.env.example`; docs now reference tracked `.env` files and `.env.local` overrides.
+
 ## [brain-0.1.10] — 2026-04-12
 
 - Version `backend/.env`, `server/.env`, and `frontend/.env`; stop gitignoring package `.env` files; ignore `**/.env.local` only; CORS adds `localhost:5174`. Phase 4 simplify routes committed with HF helpers.

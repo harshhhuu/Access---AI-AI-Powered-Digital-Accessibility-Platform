@@ -13,8 +13,7 @@
 ```bash
 cd server
 pnpm install
-cp .env.example .env
-# Edit .env — DATABASE_URL, SECRET_KEY (must match backend/.env during migration for token parity), FRONTEND_URL
+# Ensure `server/.env` exists (tracked in repo) or adjust for your machine
 pnpm exec prisma generate
 pnpm run db:migrate:dev
 ```

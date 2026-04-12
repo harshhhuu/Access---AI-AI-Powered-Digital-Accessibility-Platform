@@ -47,8 +47,7 @@ Generates descriptions of images for visually impaired users.
 ### Backend
 
 ### Frontend
-1. Copy `.env.example` to `.env`
-2. Set:
+1. Use `frontend/.env` (tracked) or a local `.env.local` for overrides. Set:
    - `VITE_API_BASE_URL=http://localhost:8000`
    - `VITE_WS_URL=ws://localhost:8000`
 3. Install dependencies with `npm install`
