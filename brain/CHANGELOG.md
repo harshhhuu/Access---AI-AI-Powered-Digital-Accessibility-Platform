@@ -1,0 +1,39 @@
+# Brain changelog
+
+Versioned record of knowledge-base and process changes. Newest first.
+
+## [brain-0.1.6] — 2026-04-12
+
+- Stop ignoring `frontend/.env` in root and `frontend/.gitignore` so default Vite API/WebSocket URLs can be versioned (same values as `.env.example`; `backend/.env` and `.env.local` remain ignored).
+
+## [brain-0.1.3] — 2026-04-12
+
+- Added phased implementation plan for full backend migration with a dedicated Python sign-inference service (`05-node-migration-phased-plan.md`); indexed `04-features-and-stack` and the new plan in `00-index.md`.
+
+## [brain-0.1.2] — 2026-04-12
+
+- Added Python → Node backend migration checklist (`03-backend-python-to-node-migration.md`) and linked it from the brain index.
+
+## [brain-0.1.5] — 2026-04-12
+
+- Added `04-features-and-stack.md`: feature walkthrough and technology stack (frontend, backend, HF, DB, extension).
+
+## [brain-0.1.4] — 2026-04-12
+
+- MediaPipe Hands: session singleton (`src/lib/mediapipeHandsClient.js`) so WASM loads once — fixes Emscripten `Module.arguments` / `arguments_` abort under React Strict Mode; hook no longer calls `hands.close()` on unmount.
+
+## [brain-0.1.3] — 2026-04-12
+
+- Sign-language hook: static `@mediapipe/hands` import, version-pinned `locateFile` CDN URLs, Strict Mode–safe cleanup (`hands.close()`), clearer error text; Vite `optimizeDeps` includes MediaPipe + TF.js.
+
+## [brain-0.1.2] — 2026-04-12
+
+- Noted optional `docker compose` for local Postgres (`02-local-dev.md`); added root `docker-compose.yml` for Postgres on port 5433.
+
+## [brain-0.1.1] — 2026-04-12
+
+- Documented local env layout and run commands (`02-local-dev.md`); expanded root `.gitignore` for `frontend/.env` and generic `.env` files.
+
+## [brain-0.1.0] — 2026-04-12
+
+- Initialized `brain/` with numbered index (`00-index.md`), project overview (`01-project-overview.md`), and this changelog.

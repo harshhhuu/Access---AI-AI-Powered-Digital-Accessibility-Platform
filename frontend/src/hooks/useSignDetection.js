@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as tf from "@tensorflow/tfjs";
+import { ensureMediapipeHands } from "../lib/mediapipeHandsClient";
 import { WS_SIGN_URL } from "../api/api";
 
 // Alphabetical order to match the trained model / sklearn LabelEncoder output.
@@ -52,25 +53,27 @@ export function useSignDetection(webcamRef, canvasRef, isActive) {
 
     async function loadModels() {
       try {
-        const { Hands } = await import("@mediapipe/hands");
+        const handsInstance = await ensureMediapipeHands();
+        if (cancelled) {
+          return;
+        }
 
-        const hands = new Hands({
-          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-        });
-
-        hands.setOptions({
+        handsInstance.setOptions({
           maxNumHands: 1,
           modelComplexity: 1,
           minDetectionConfidence: 0.6,
           minTrackingConfidence: 0.5,
         });
 
-        hands.onResults((results) => {
+        handsInstance.onResults((results) => {
           latestResultsRef.current = results;
         });
 
-        await hands.initialize();
-        handsRef.current = hands;
+        if (cancelled) {
+          return;
+        }
+
+        handsRef.current = handsInstance;
 
         await tf.setBackend("webgl");
         await tf.ready();
@@ -92,7 +95,12 @@ export function useSignDetection(webcamRef, canvasRef, isActive) {
       } catch (loadError) {
         console.error("Failed to load sign detection models.", loadError);
         if (!cancelled) {
-          setError("Failed to load hand detection.");
+          const detail = loadError instanceof Error ? loadError.message : String(loadError);
+          setError(
+            detail
+              ? `Failed to load hand detection: ${detail}`
+              : "Failed to load hand detection.",
+          );
           setModelReady(false);
         }
       }
@@ -102,6 +110,7 @@ export function useSignDetection(webcamRef, canvasRef, isActive) {
 
     return () => {
       cancelled = true;
+      handsRef.current = null;
     };
   }, [isActive]);
 

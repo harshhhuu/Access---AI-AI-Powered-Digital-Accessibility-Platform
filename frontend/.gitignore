@@ -25,8 +25,7 @@ build/
 coverage/
 .nyc_output
 
-# Environment
-.env
+# Environment (`.env` is tracked; local overrides stay in `.env.local`)
 .env.*
 !.env.example
 
