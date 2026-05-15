@@ -4,6 +4,7 @@
   "description": "Root scripts to run the full local stack (Postgres + sign-inference + Node API + Vite)",
   "scripts": {
     "dev": "bash scripts/dev-all.sh",
+    "dev:win": "concurrently -k -n sign,api,web -c magenta,green,cyan \"cd services/sign-inference && .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 9001\" \"pnpm --dir server dev\" \"pnpm --dir frontend dev\"",
     "dev:docker": "bash scripts/dev-docker-stack.sh"
   },
   "devDependencies": {

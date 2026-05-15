@@ -15,6 +15,8 @@ It combines **computer vision, speech processing, and natural language AI** to h
 
 🏆 **Achievement:** 4th Place — NMIMS Tech Hackathon on Disability Inclusion
 
+RUN : pnpm run dev:win
+
 ---
 
 # 🎥 Demo
