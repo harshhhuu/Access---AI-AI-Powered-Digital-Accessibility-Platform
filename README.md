@@ -13,8 +13,6 @@ AccessAI is an **AI-powered accessibility platform** designed to make websites e
 
 It combines **computer vision, speech processing, and natural language AI** to help users interact with digital content more easily.
 
-🏆 **Achievement:** 4th Place — NMIMS Tech Hackathon on Disability Inclusion
-
 RUN : pnpm run dev:win
 
 ---
