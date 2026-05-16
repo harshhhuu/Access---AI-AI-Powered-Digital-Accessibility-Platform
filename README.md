@@ -7,7 +7,6 @@
 [![React](https://img.shields.io/badge/react-frontend-61dafb)](https://react.dev/)
 [![Python](https://img.shields.io/badge/python-sign--ml-3776AB)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/database-postgresql-336791)](https://www.postgresql.org/)
-[![Hackathon](https://img.shields.io/badge/hackathon-NMIMS%202026-orange)]()
 
 AccessAI is an **AI-powered accessibility platform** designed to make websites easier to use for people with disabilities.
 
